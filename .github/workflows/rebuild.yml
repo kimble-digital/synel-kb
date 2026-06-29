@@ -1,9 +1,12 @@
 name: Rebuild site when KB content changes
 
 # Polls PocketBase every ~10 minutes. If any article changed since the last
-# build, it pushes an empty commit which triggers a Vercel deploy (Astro
-# re-fetches all articles at build time). Fully decoupled from PocketBase —
-# cannot interfere with editing. Also runnable on demand from the Actions tab.
+# build, pushes an empty/marker commit which triggers a Vercel deploy.
+#
+# IMPORTANT: Vercel's free (Hobby) plan only builds commits pushed by the
+# account owner — not github-actions[bot]. So we push using your personal
+# token (repo secret GH_PAT) and author the commit as your GitHub user, so
+# Vercel attributes the deploy to you and builds it.
 on:
   schedule:
     - cron: "*/10 * * * *"
@@ -24,8 +27,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}   # push as YOU, not the bot
 
       - name: Rebuild if PocketBase content changed
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           set -e
           LATEST=$(curl -s "$PB_URL/api/collections/articles/records?perPage=1&sort=-updated" \
@@ -36,14 +43,18 @@ jobs:
             echo "Could not read PocketBase (it may be momentarily down); skipping this run."
             exit 0
           fi
-          if [ "$LATEST" != "$PREV" ]; then
-            echo "Change detected — triggering a rebuild."
-            echo "$LATEST" > .last-kb-sync
-            git config user.name "synel-kb-bot"
-            git config user.email "bot@users.noreply.github.com"
-            git add .last-kb-sync
-            git commit -m "chore: KB content updated — rebuild"
-            git push
-          else
+          if [ "$LATEST" = "$PREV" ]; then
             echo "No change since last build — nothing to do."
+            exit 0
           fi
+          echo "Change detected — triggering a rebuild."
+          # author the commit as the token owner (you) so Vercel will build it
+          WHO=$(curl -s -H "Authorization: Bearer $GH_PAT" https://api.github.com/user)
+          LOGIN=$(echo "$WHO" | python3 -c "import sys,json;print(json.load(sys.stdin).get('login',''))")
+          UID_=$(echo "$WHO"  | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))")
+          git config user.name  "${LOGIN:-synel-kb}"
+          git config user.email "${UID_}+${LOGIN}@users.noreply.github.com"
+          echo "$LATEST" > .last-kb-sync
+          git add .last-kb-sync
+          git commit -m "chore: KB content updated — rebuild"
+          git push
