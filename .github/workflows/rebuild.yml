@@ -1,28 +1,49 @@
-name: Rebuild site on KB change
+name: Rebuild site when KB content changes
 
-# Triggered by PocketBase (repository_dispatch "pb-publish") when an article is
-# published/updated/deleted, or manually from the Actions tab.
+# Polls PocketBase every ~10 minutes. If any article changed since the last
+# build, it pushes an empty commit which triggers a Vercel deploy (Astro
+# re-fetches all articles at build time). Fully decoupled from PocketBase —
+# cannot interfere with editing. Also runnable on demand from the Actions tab.
 on:
-  repository_dispatch:
-    types: [pb-publish]
+  schedule:
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
-# Avoid stacking many rebuilds if several edits land close together.
 concurrency:
   group: kb-rebuild
   cancel-in-progress: false
 
+env:
+  PB_URL: https://synel-kb-kimble.fly.dev
+
 jobs:
-  trigger-deploy:
+  check-and-rebuild:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Empty commit to trigger Vercel build
+
+      - name: Rebuild if PocketBase content changed
         run: |
-          git config user.name "synel-kb-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git commit --allow-empty -m "chore: rebuild KB (content updated)"
-          git push
+          set -e
+          LATEST=$(curl -s "$PB_URL/api/collections/articles/records?perPage=1&sort=-updated" \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print((d.get('items') or [{}])[0].get('updated',''))")
+          PREV=$(cat .last-kb-sync 2>/dev/null || echo "")
+          echo "latest in PocketBase: '$LATEST'  | last built: '$PREV'"
+          if [ -z "$LATEST" ]; then
+            echo "Could not read PocketBase (it may be momentarily down); skipping this run."
+            exit 0
+          fi
+          if [ "$LATEST" != "$PREV" ]; then
+            echo "Change detected — triggering a rebuild."
+            echo "$LATEST" > .last-kb-sync
+            git config user.name "synel-kb-bot"
+            git config user.email "bot@users.noreply.github.com"
+            git add .last-kb-sync
+            git commit -m "chore: KB content updated — rebuild"
+            git push
+          else
+            echo "No change since last build — nothing to do."
+          fi
