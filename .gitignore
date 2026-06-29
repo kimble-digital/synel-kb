@@ -13,3 +13,4 @@ node_modules/
 # os
 .DS_Store
 .vercel
+.fuse_hidden*
