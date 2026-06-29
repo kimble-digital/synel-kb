@@ -1,0 +1,28 @@
+name: Rebuild site on KB change
+
+# Triggered by PocketBase (repository_dispatch "pb-publish") when an article is
+# published/updated/deleted, or manually from the Actions tab.
+on:
+  repository_dispatch:
+    types: [pb-publish]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Avoid stacking many rebuilds if several edits land close together.
+concurrency:
+  group: kb-rebuild
+  cancel-in-progress: false
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Empty commit to trigger Vercel build
+        run: |
+          git config user.name "synel-kb-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git commit --allow-empty -m "chore: rebuild KB (content updated)"
+          git push

@@ -1,0 +1,57 @@
+---
+// src/components/Header.astro — Synel Knowledge Base
+// Same visual system as the Synel France template header.
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/#categories', label: 'Browse' },
+  { href: '/support/', label: 'Support' },
+];
+---
+
+<header class="sf-header">
+  <div class="sf-header__inner">
+    <a href="/" class="sf-header__logo" aria-label="Synel Knowledge Base, home">
+      <img src="/images/synel-logo.png" alt="Synel" class="sf-logo-img" width="62" height="42" />
+      <span class="sf-header__logo-divider" aria-hidden="true"></span>
+      <span class="sf-header__logo-sub">Knowledge<br />Base</span>
+    </a>
+
+    <nav class="sf-header__nav" aria-label="Primary">
+      <ul class="sf-header__nav-list">
+        {navLinks.map(link => (
+          <li><a href={link.href} class="sf-header__nav-link">{link.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <a href="/support/" class="sf-header__cta">
+      Contact support
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+    </a>
+  </div>
+</header>
+
+<style>
+  .sf-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.92);
+    backdrop-filter: saturate(180%) blur(12px); -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--c-divider); }
+  .sf-header__inner { max-width: 80rem; margin: 0 auto; padding: 1rem clamp(1.25rem, 4vw, 3rem);
+    display: flex; align-items: center; gap: 2rem; }
+  .sf-header__logo { display: inline-flex; align-items: center; gap: 0.7rem; text-decoration: none; flex-shrink: 0; }
+  .sf-header__logo-divider { width: 1.5px; height: 30px; background: var(--c-divider); border-radius: 2px; }
+  .sf-header__logo-sub { font-family: var(--site-font-ui); font-weight: 700; font-size: 0.82rem; line-height: 1.05; color: var(--c-ink); text-transform: uppercase; letter-spacing: 0.13em; }
+  .sf-header__nav { flex: 1; display: flex; justify-content: center; }
+  .sf-header__nav-list { list-style: none; padding: 0; margin: 0; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .sf-header__nav-link { display: inline-block; padding: 0.5rem 0.875rem; font-family: var(--site-font-ui); font-size: 0.875rem; font-weight: 600; color: var(--c-ink); text-decoration: none; border-radius: 8px; outline: none; transition: background-color 0.15s ease, color 0.15s ease; }
+  .sf-header__nav-link:hover { background: var(--c-surface-2); color: var(--c-coral); }
+  .sf-header__nav-link:focus-visible { outline: 2px solid var(--c-coral); outline-offset: 2px; }
+  .sf-header__cta { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.625rem 1rem; font-family: var(--site-font-ui); font-size: 0.875rem; font-weight: 700; color: #fff; background: var(--c-coral); border-radius: 100px; text-decoration: none; outline: none; transition: background-color 0.2s ease, transform 0.2s ease; flex-shrink: 0; }
+  .sf-header__cta:hover { background: #d65a47; transform: translateY(-1px); }
+  .sf-header__cta:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
+  @media (max-width: 900px) {
+    .sf-header__inner { flex-wrap: wrap; gap: 1rem; }
+    .sf-header__nav { order: 3; flex-basis: 100%; justify-content: flex-start; }
+    .sf-header__nav-list { gap: 0.25rem; }
+    .sf-header__nav-link { padding: 0.4rem 0.625rem; font-size: 0.8125rem; }
+  }
+</style>

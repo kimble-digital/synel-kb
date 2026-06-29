@@ -1,0 +1,93 @@
+---
+// src/components/Footer.astro — Synel Knowledge Base
+import { getCategories, categorySlug } from '../lib/articles.js';
+const currentYear = new Date().getFullYear();
+const cats = (await getCategories()).slice(0, 6);
+const resourceLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/support/', label: 'Technical Support' },
+  { href: 'https://www.synel.co.uk', label: 'Synel UK' },
+  { href: 'https://www.synel.com', label: 'Synel International' },
+];
+---
+
+<footer class="sf-footer">
+  <div class="sf-footer__inner">
+    <div class="sf-footer__grid">
+      <div class="sf-footer__col sf-footer__col--brand">
+        <div class="sf-footer__logo">
+          <img src="/images/synel-logo.png" alt="Synel" class="sf-logo-img" width="56" height="38" />
+          <span class="sf-footer__logo-sub">Knowledge Base</span>
+        </div>
+        <p class="sf-footer__tagline">
+          Setup guides, troubleshooting and how-tos for Synel workforce management,
+          time &amp; attendance, and access control products.
+        </p>
+        <ul class="sf-footer__contact">
+          <li>
+            <span class="sf-footer__contact-lbl">Support</span>
+            <a href="/support/">Open the support page</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sf-footer__col">
+        <h4 class="sf-footer__heading">Top categories</h4>
+        <ul class="sf-footer__links">
+          {cats.map(c => (
+            <li><a href={`/category/${categorySlug(c.name)}/`}>{c.name}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="sf-footer__col">
+        <h4 class="sf-footer__heading">Resources</h4>
+        <ul class="sf-footer__links">
+          {resourceLinks.map(l => (
+            <li><a href={l.href}>{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="sf-footer__col">
+        <h4 class="sf-footer__heading">Help</h4>
+        <ul class="sf-footer__links">
+          <li><a href="/support/">Contact support</a></li>
+          <li><a href="/#search">Search articles</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sf-footer__base">
+      <div class="sf-footer__copy">© {currentYear} Synel. All rights reserved.</div>
+      <div class="sf-footer__group">
+        <a href="https://www.synel.com" target="_blank" rel="noopener noreferrer">synel.com</a>
+        <a href="https://www.synel.co.uk" target="_blank" rel="noopener noreferrer">synel.co.uk</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .sf-footer { background: linear-gradient(180deg, var(--c-navy) 0%, var(--c-navy-deep) 100%); color: rgba(255,255,255,0.7); padding: 4rem 0 2rem; }
+  .sf-footer__inner { max-width: 80rem; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 3rem); }
+  .sf-footer__grid { display: grid; grid-template-columns: 1fr; gap: 3rem; margin-bottom: 3rem; }
+  @media (min-width: 768px) { .sf-footer__grid { grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 3rem 2rem; } }
+  .sf-footer__logo { display: inline-flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+  .sf-footer__logo-mark { font-family: var(--site-font-ui); font-weight: 800; font-size: 1.5rem; color: #fff; letter-spacing: -0.02em; }
+  .sf-footer__logo-sub { font-family: var(--site-font-ui); font-weight: 600; font-size: 0.875rem; color: var(--c-coral-soft); text-transform: uppercase; letter-spacing: 0.1em; }
+  .sf-footer__tagline { font-size: 0.9375rem; line-height: 1.6; margin-bottom: 1.5rem; max-width: 360px; }
+  .sf-footer__contact { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.625rem; }
+  .sf-footer__contact li { font-size: 0.875rem; }
+  .sf-footer__contact-lbl { display: block; font-size: 0.6875rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.125rem; }
+  .sf-footer__contact a { color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.15s ease; }
+  .sf-footer__contact a:hover { color: var(--c-coral-soft); }
+  .sf-footer__heading { font-family: var(--site-font-ui); font-size: 0.75rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+  .sf-footer__links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .sf-footer__links a { color: rgba(255,255,255,0.65); text-decoration: none; font-size: 0.875rem; transition: color 0.15s ease; }
+  .sf-footer__links a:hover { color: #fff; }
+  .sf-footer__base { padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.8125rem; color: rgba(255,255,255,0.5); }
+  .sf-footer__group { display: flex; gap: 1.25rem; }
+  .sf-footer__group a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.15s ease; }
+  .sf-footer__group a:hover { color: rgba(255,255,255,0.85); }
+</style>

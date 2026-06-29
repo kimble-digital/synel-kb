@@ -1,0 +1,41 @@
+---
+// Collapsible category nav. Current category expanded; current article highlighted.
+import { getCategories, categorySlug, CATEGORY_META } from '../lib/articles.js';
+import { icon } from '../lib/icons.js';
+
+interface Props { currentCat?: string; currentUid?: string; }
+const { currentCat = '', currentUid = '' } = Astro.props;
+const categories = await getCategories();
+---
+
+<aside class="kb-sidebar">
+  <div class="kb-sidebar__sticky">
+    <div class="kb-sidebar__title">Categories</div>
+    <nav aria-label="Knowledge base categories">
+      {categories.map((c) => {
+        const slug = categorySlug(c.name);
+        const open = slug === currentCat;
+        const hue = (CATEGORY_META[c.name] || {}).hue || 'var(--c-navy)';
+        return (
+          <details class="kb-cat" open={open}>
+            <summary>
+              <span class="kb-cat__mark" style={`background:${hue}`}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icon(slug)} />
+              </span>
+              <span>{c.name}</span>
+              <span class="kb-cat__count">{c.count}</span>
+              <svg class="kb-cat__chev" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </summary>
+            <ul class="kb-cat__list">
+              {c.articles.map((a) => (
+                <li>
+                  <a href={`/article/${a.uid}/`} class={a.uid === currentUid ? 'is-current' : ''} aria-current={a.uid === currentUid ? 'page' : undefined}>{a.title}</a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        );
+      })}
+    </nav>
+  </div>
+</aside>

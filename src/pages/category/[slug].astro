@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getCategories, categorySlug, excerpt, CATEGORY_META } from '../../lib/articles.js';
+import { icon } from '../../lib/icons.js';
+
+export async function getStaticPaths() {
+  const categories = await getCategories();
+  return categories.map((c) => ({ params: { slug: c.slug }, props: { category: c } }));
+}
+
+const { category } = Astro.props;
+const slug = categorySlug(category.name);
+const hue = (CATEGORY_META[category.name] || {}).hue || 'var(--c-navy)';
+---
+
+<BaseLayout title={category.name} description={`Synel knowledge base articles: ${category.name}.`}>
+  <div class="kb-container">
+    <div class="kb-docs">
+      <Sidebar currentCat={slug} />
+
+      <div class="kb-main">
+        <nav class="kb-crumb" aria-label="Breadcrumb">
+          <a href="/">Home</a> <span>/</span> <span>{category.name}</span>
+        </nav>
+
+        <header class="kb-pagehead">
+          <span class="kb-icon" style={`background:${hue}`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icon(slug)} />
+          </span>
+          <div>
+            <h1 class="kb-pagehead__title">{category.name}</h1>
+            <p class="kb-pagehead__meta">{category.count} article{category.count === 1 ? '' : 's'}</p>
+          </div>
+        </header>
+
+        <div class="kb-list">
+          {category.articles.map((a) => (
+            <a class="kb-row" href={`/article/${a.uid}/`}>
+              <span>
+                <span class="kb-row__title">{a.title}</span>
+                <span class="kb-row__excerpt">{excerpt(a.body_html, 110)}</span>
+              </span>
+              <svg class="kb-row__arrow" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

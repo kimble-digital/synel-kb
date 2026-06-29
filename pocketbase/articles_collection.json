@@ -1,0 +1,20 @@
+{
+  "name": "articles",
+  "type": "base",
+  "fields": [
+    {"name": "uid",         "type": "text",   "required": true},
+    {"name": "title",       "type": "text",   "required": true},
+    {"name": "category",    "type": "select", "required": true,  "maxSelect": 1, "values": ["Access Control","Account & Login","Biometrics & Enrolment","EPOS & Cashless","French Integrations","General / Uncategorised","Integrations & Payroll Export","Modules & Reporting","Networking & Infrastructure","Scheduling & Absence","Software - TimeLOG Pro / Legacy","Software - TimeLOG Web / Synergy WF","Terminals & Devices","Training Material"]},
+    {"name": "body_html",   "type": "editor", "required": true},
+    {"name": "product",     "type": "text"},
+    {"name": "quality",     "type": "select", "maxSelect": 1, "values": ["good","thin"]},
+    {"name": "also_covers", "type": "text"},
+    {"name": "status",      "type": "select", "required": true, "maxSelect": 1, "values": ["published","needs_review","draft","archived"]},
+    {"name": "images",      "type": "file",   "maxSelect": 10, "maxSize": 0, "mimeTypes": ["image/png","image/jpeg","image/webp","image/gif"]},
+    {"name": "created",     "type": "autodate", "onCreate": true, "onUpdate": false},
+    {"name": "updated",     "type": "autodate", "onCreate": true, "onUpdate": true}
+  ],
+  "listRule": "status = 'published'",
+  "viewRule": "status = 'published'",
+  "indexes": ["CREATE UNIQUE INDEX `idx_articles_uid` ON `articles` (`uid`)"]
+}

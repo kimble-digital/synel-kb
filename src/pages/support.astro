@@ -1,0 +1,224 @@
+---
+// pages/support.astro — Synel Knowledge Base
+// Adapted from the Synel UK main-site Technical Support page so branding matches.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+---
+
+<BaseLayout title="Technical Support" description="Contact Synel UK's technical support team for software and hardware troubleshooting, maintenance, and service requests. Help desk open Mon–Fri, 09:00–17:30.">
+
+  <!-- HERO -->
+  <section class="ts-hero">
+    <div class="ts-hero__bg">
+      <div class="ts-hero__glow ts-hero__glow--coral"></div>
+      <div class="ts-hero__glow ts-hero__glow--green"></div>
+    </div>
+
+    <nav class="ts-breadcrumb">
+      <div class="ts-container">
+        <ol class="ts-breadcrumb__list">
+          <li><a href="/">Home</a>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </li>
+          <li class="ts-breadcrumb__current">Technical Support</li>
+        </ol>
+      </div>
+    </nav>
+
+    <div class="ts-container ts-hero__inner">
+      <div class="ts-hero__content">
+        <span class="ts-pill">Support</span>
+        <h1 class="ts-hero__title">Synel's Technical Support</h1>
+        <p class="ts-hero__subtitle">Our friendly Technical Support team is here to help you with any software or hardware needs — handling all troubleshooting, maintenance, support, and service requests. In addition, the team offers product consulting, installation, on-site training, and engineer call-outs. Every call is important to us.</p>
+      </div>
+
+      <div class="ts-hours-card">
+        <div class="ts-hours-card__icon">
+          <svg width="24" height="24" fill="none" stroke="#319065" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="ts-hours-card__body">
+          <strong class="ts-hours-card__title">Help Desk Hours</strong>
+          <p class="ts-hours-card__main">Monday – Friday, 09:00 – 17:30</p>
+          <p class="ts-hours-card__note">Excluding UK banking holidays. During the festive season, the help desk closes at <strong>14:00 on Christmas Eve</strong> and re-opens at 09:00 on the first business day in January.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT + RESOURCES -->
+  <section class="ts-main">
+    <div class="ts-container ts-main__grid">
+
+      <div>
+        <h2 class="ts-section-title">Contact Us</h2>
+        <p class="ts-section-intro">If your company is covered by our support contract, your call will be logged and you will be given a reference number. If your company is not covered, please let our team know.</p>
+
+        <div class="ts-contact-cards">
+          <a href="tel:+442089009991" class="ts-contact-card ts-contact-card--phone">
+            <div class="ts-contact-card__icon" style="background:#E66551;">
+              <svg width="22" height="22" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+            </div>
+            <div class="ts-contact-card__body">
+              <span class="ts-contact-card__label">Phone</span>
+              <span class="ts-contact-card__value">+44 (0)208 900 9991</span>
+            </div>
+            <svg class="ts-contact-card__arrow" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+
+          <a href="mailto:technical.support@syneluk.com" class="ts-contact-card ts-contact-card--email">
+            <div class="ts-contact-card__icon" style="background:#319065;">
+              <svg width="22" height="22" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="ts-contact-card__body">
+              <span class="ts-contact-card__label">Email</span>
+              <span class="ts-contact-card__value">technical.support@syneluk.com</span>
+            </div>
+            <svg class="ts-contact-card__arrow" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="ts-section-title">Help Centre &amp; Resources</h2>
+        <p class="ts-section-intro">Log a support call, get live remote assistance, or read our device guides.</p>
+
+        <div class="ts-resource-cards">
+          <a href="https://desk.zoho.eu/portal/synelindustriesuk" target="_blank" rel="noopener noreferrer" class="ts-resource-card">
+            <div class="ts-resource-card__icon" style="background:rgba(230,101,81,0.08);">
+              <svg width="22" height="22" fill="none" stroke="#E66551" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            </div>
+            <div class="ts-resource-card__body">
+              <strong>Log a Support Call</strong>
+              <span>Raise a ticket via the Synel UK help centre portal</span>
+            </div>
+            <svg class="ts-resource-card__ext" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+
+          <a href="https://secure.logmeinrescue.com/Customer/Code.aspx" target="_blank" rel="noopener noreferrer" class="ts-resource-card">
+            <div class="ts-resource-card__icon" style="background:rgba(49,144,101,0.08);">
+              <svg width="22" height="22" fill="none" stroke="#319065" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="ts-resource-card__body">
+              <strong>Live Remote Support</strong>
+              <span>Connect with our team via LogMeIn Rescue for real-time screen support</span>
+            </div>
+            <svg class="ts-resource-card__ext" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+
+          <a href="https://www.synel.co.uk/support/fingerprint-guide.pdf" target="_blank" rel="noopener noreferrer" class="ts-resource-card">
+            <div class="ts-resource-card__icon" style="background:rgba(190,174,45,0.1);">
+              <svg width="22" height="22" fill="none" stroke="#BEAE2D" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/></svg>
+            </div>
+            <div class="ts-resource-card__body">
+              <strong>Fingerprint Enrolment Guide</strong>
+              <span>Step-by-step guide to enrolling fingerprints on Synel devices</span>
+            </div>
+            <svg class="ts-resource-card__ext" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </a>
+
+          <a href="https://www.synel.co.uk/support/device-cleaning-guide.pdf" target="_blank" rel="noopener noreferrer" class="ts-resource-card">
+            <div class="ts-resource-card__icon" style="background:rgba(49,144,101,0.08);">
+              <svg width="22" height="22" fill="none" stroke="#319065" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <div class="ts-resource-card__body">
+              <strong>Device Cleaning &amp; Disinfection Guide</strong>
+              <span>How to safely clean and disinfect your Synel hardware</span>
+            </div>
+            <svg class="ts-resource-card__ext" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="ts-cta">
+    <div class="ts-cta__grid"></div>
+    <div class="ts-container ts-cta__inner">
+      <h2 class="ts-cta__title">Need a new system or upgrade?</h2>
+      <p class="ts-cta__copy">Speak to our sales team about expanding your Synel setup.</p>
+      <div class="ts-cta__actions">
+        <a href="https://www.synel.co.uk" target="_blank" rel="noopener noreferrer" class="ts-btn-primary">
+          Book a Free Consultation
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <a href="tel:+442089009991" class="ts-btn-secondary">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          020 8900 9991
+        </a>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style is:global>
+  .ts-container { max-width: 1100px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem; }
+  .ts-pill { display: inline-block; padding: 6px 16px; border-radius: 100px; font-size: 0.8125rem; font-weight: 600; background: rgba(230, 101, 81, 0.08); color: #E66551; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-section-title { font-size: clamp(1.375rem, 2.5vw, 1.75rem); color: #27314a; margin-bottom: 0.5rem; line-height: 1.2; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-section-intro { font-size: 0.9375rem; color: #5a6579; line-height: 1.7; margin-bottom: 1.75rem; max-width: 520px; }
+
+  .ts-hero { position: relative; overflow: hidden; background: #f0f2f5; padding-bottom: 4rem; }
+  .ts-hero__bg { position: absolute; inset: 0; pointer-events: none; }
+  .ts-hero__glow { position: absolute; border-radius: 50%; filter: blur(140px); }
+  .ts-hero__glow--coral { top: -80px; right: -80px; width: 400px; height: 400px; background: rgba(230, 101, 81, 0.06); }
+  .ts-hero__glow--green { bottom: -80px; left: -40px; width: 350px; height: 350px; background: rgba(49, 144, 101, 0.05); }
+
+  .ts-breadcrumb { position: relative; z-index: 2; border-bottom: 1px solid #e5e7eb; }
+  .ts-breadcrumb__list { display: flex; align-items: center; list-style: none; margin: 0; padding: 0.75rem 0; font-size: 0.875rem; color: #8b94a6; }
+  .ts-breadcrumb__list li { display: flex; align-items: center; }
+  .ts-breadcrumb__list a { color: #8b94a6; text-decoration: none; }
+  .ts-breadcrumb__list a:hover { opacity: 0.7; }
+  .ts-breadcrumb__list svg { margin: 0 0.5rem; opacity: 0.4; }
+  .ts-breadcrumb__current { color: #27314a; font-weight: 500; }
+
+  .ts-hero__inner { position: relative; z-index: 2; padding-top: 3.5rem; display: flex; flex-direction: column; gap: 2.5rem; }
+  @media (min-width: 768px) { .ts-hero__inner { flex-direction: row; align-items: flex-start; gap: 4rem; padding-top: 4rem; } }
+  .ts-hero__content { flex: 1; }
+  .ts-hero__title { font-size: clamp(2rem, 4vw, 2.75rem); color: #27314a; line-height: 1.1; margin-top: 0.875rem; margin-bottom: 1.25rem; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; }
+  .ts-hero__subtitle { font-size: 1.0625rem; color: #5a6579; line-height: 1.7; max-width: 560px; }
+
+  .ts-hours-card { display: flex; gap: 1rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 20px -4px rgba(39, 49, 74, 0.06); align-items: flex-start; flex-shrink: 0; }
+  @media (min-width: 768px) { .ts-hours-card { max-width: 340px; } }
+  .ts-hours-card__icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(49, 144, 101, 0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ts-hours-card__title { display: block; font-size: 1rem; color: #27314a; font-weight: 600; margin-bottom: 0.375rem; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-hours-card__main { font-size: 1.0625rem; font-weight: 700; color: #319065; margin: 0 0 0.625rem; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-hours-card__note { font-size: 0.8125rem; color: #8b94a6; line-height: 1.6; margin: 0; }
+  .ts-hours-card__note strong { color: #5a6579; }
+
+  .ts-main { background: #fff; padding: 5rem 0; }
+  .ts-main__grid { display: grid; grid-template-columns: 1fr; gap: 4rem; }
+  @media (min-width: 900px) { .ts-main__grid { grid-template-columns: 1fr 1fr; gap: 5rem; } }
+
+  .ts-contact-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .ts-contact-card { display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 14px; text-decoration: none; transition: all 0.2s ease; }
+  .ts-contact-card:hover { border-color: #E66551; box-shadow: 0 4px 20px -4px rgba(230, 101, 81, 0.12); transform: translateX(2px); }
+  .ts-contact-card__icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ts-contact-card__body { flex: 1; }
+  .ts-contact-card__label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #8b94a6; margin-bottom: 0.125rem; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-contact-card__value { display: block; font-size: 1rem; font-weight: 600; color: #27314a; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-contact-card__arrow { color: #8b94a6; flex-shrink: 0; transition: transform 0.2s ease; }
+  .ts-contact-card:hover .ts-contact-card__arrow { transform: translateX(3px); color: #E66551; }
+
+  .ts-resource-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .ts-resource-card { display: flex; align-items: center; gap: 1rem; padding: 1.125rem 1.25rem; background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 14px; text-decoration: none; transition: all 0.2s ease; }
+  .ts-resource-card:hover { border-color: #319065; box-shadow: 0 4px 20px -4px rgba(49, 144, 101, 0.12); transform: translateX(2px); }
+  .ts-resource-card__icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ts-resource-card__body { flex: 1; }
+  .ts-resource-card__body strong { display: block; font-size: 0.9375rem; color: #27314a; font-weight: 600; margin-bottom: 0.125rem; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-resource-card__body span { display: block; font-size: 0.8125rem; color: #8b94a6; line-height: 1.5; }
+  .ts-resource-card__ext { color: #8b94a6; flex-shrink: 0; }
+  .ts-resource-card:hover .ts-resource-card__ext { color: #319065; }
+
+  .ts-cta { position: relative; background: #27314a; padding: 5rem 0; overflow: hidden; }
+  .ts-cta__grid { position: absolute; inset: 0; opacity: 0.06; background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 50px 50px; }
+  .ts-cta__inner { position: relative; z-index: 1; text-align: center; }
+  .ts-cta__title { font-size: clamp(1.75rem, 3.5vw, 2.5rem); color: #fff; margin-bottom: 0.75rem; font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; }
+  .ts-cta__copy { color: rgba(255,255,255,0.7); font-size: 1.0625rem; margin-bottom: 2rem; }
+  .ts-cta__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+  .ts-btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 14px 28px; background: #E66551; color: #fff; font-size: 1rem; font-weight: 600; border-radius: 12px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 20px rgba(230, 101, 81, 0.3); font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-btn-primary:hover { background: #d45540; transform: scale(1.02); }
+  .ts-btn-secondary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 14px 28px; border: 2px solid rgba(255,255,255,0.2); color: #fff; font-size: 1rem; font-weight: 600; border-radius: 12px; text-decoration: none; transition: all 0.2s ease; font-family: 'DM Sans', system-ui, sans-serif; }
+  .ts-btn-secondary:hover { background: rgba(255,255,255,0.1); }
+</style>

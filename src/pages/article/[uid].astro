@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getArticles, categorySlug } from '../../lib/articles.js';
+
+export async function getStaticPaths() {
+  const articles = await getArticles();
+  return articles.map((a) => ({ params: { uid: a.uid }, props: { article: a } }));
+}
+
+const { article } = Astro.props;
+const catSlug = categorySlug(article.category);
+const catUrl = `/category/${catSlug}/`;
+const desc = article.body_html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155);
+---
+
+<BaseLayout title={article.title} description={desc}>
+  <div class="kb-container">
+    <div class="kb-docs">
+      <Sidebar currentCat={catSlug} currentUid={article.uid} />
+
+      <div class="kb-main">
+        <article class="kb-article">
+          <nav class="kb-crumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span>/</span>
+            <a href={catUrl}>{article.category}</a> <span>/</span>
+            <span>{article.title}</span>
+          </nav>
+
+          <p class="kb-article__cat"><a href={catUrl} style="text-decoration:none;color:inherit;">{article.category}</a></p>
+          <h1 class="kb-article__title">{article.title}</h1>
+          {article.product && <span class="kb-pill">{article.product}</span>}
+
+          {article.also_covers
+            ? <p class="kb-article__also">Also covers: {article.also_covers}</p>
+            : <div style="height:1.25rem;border-bottom:1px solid var(--c-divider);margin-bottom:1.5rem;"></div>}
+
+          <div class="prose" set:html={article.body_html} />
+
+          <div style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--c-divider);display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <a class="kb-btn kb-btn--ghost" href={catUrl}>← More in {article.category}</a>
+            <a class="kb-btn" href="/support/">Still stuck? Contact support</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
