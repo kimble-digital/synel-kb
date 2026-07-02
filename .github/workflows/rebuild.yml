@@ -1,16 +1,16 @@
 name: Rebuild site when KB content changes
 
 # Polls PocketBase every ~10 min. If an article changed since the last build,
-# it builds the Astro site and deploys to Vercel via the Vercel CLI using a
-# token — which bypasses Vercel Hobby's "commit author must be a team member"
-# block that was stopping the git-triggered deploys.
-#
-# State (last-seen timestamp) is kept in the Actions cache, so this workflow
-# never pushes commits.
+# pushes a marker commit AUTHORED as ricky@kimbledigital.com. Vercel's git
+# integration then builds it. (This only works once that email is verified on
+# the GitHub account — otherwise Vercel Hobby blocks the deploy.)
 on:
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 concurrency:
   group: kb-rebuild
@@ -20,51 +20,25 @@ env:
   PB_URL: https://synel-kb-kimble.fly.dev
 
 jobs:
-  build-and-deploy:
+  check-and-rebuild:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          token: ${{ secrets.GH_PAT }}   # push so it can commit back
 
-      # restore the last-seen PocketBase timestamp from cache
-      - uses: actions/cache/restore@v4
-        with:
-          path: .last-kb-sync
-          key: kb-sync-${{ github.run_id }}
-          restore-keys: kb-sync-
-
-      - name: Detect change
-        id: check
+      - name: Rebuild if PocketBase content changed
         run: |
+          set -e
           LATEST=$(curl -s "$PB_URL/api/collections/articles/records?perPage=1&sort=-updated" \
             | python3 -c "import sys,json; print((json.load(sys.stdin).get('items') or [{}])[0].get('updated',''))")
           PREV=$(cat .last-kb-sync 2>/dev/null || echo "")
           echo "latest in PocketBase: '$LATEST' | last built: '$PREV'"
-          if [ -n "$LATEST" ] && [ "$LATEST" != "$PREV" ]; then
-            echo "changed=yes" >> "$GITHUB_OUTPUT"
-            printf '%s' "$LATEST" > .last-kb-sync
-          else
-            echo "changed=no" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Build & deploy to Vercel
-        if: steps.check.outputs.changed == 'yes'
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          npm i -g vercel@latest
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          vercel build --prod --token="$VERCEL_TOKEN"
-          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
-
-      # persist the new timestamp so we don't redeploy the same change
-      - uses: actions/cache/save@v4
-        if: steps.check.outputs.changed == 'yes'
-        with:
-          path: .last-kb-sync
-          key: kb-sync-${{ github.run_id }}
+          if [ -z "$LATEST" ]; then echo "PocketBase unreachable; skipping."; exit 0; fi
+          if [ "$LATEST" = "$PREV" ]; then echo "No change; nothing to do."; exit 0; fi
+          printf '%s' "$LATEST" > .last-kb-sync
+          git config user.name  "Synel KB (auto)"
+          git config user.email "ricky@kimbledigital.com"
+          git add .last-kb-sync
+          git commit -m "chore: KB content updated — rebuild"
+          git push
