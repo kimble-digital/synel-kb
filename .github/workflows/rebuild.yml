@@ -1,19 +1,16 @@
 name: Rebuild site when KB content changes
 
-# Polls PocketBase every ~10 minutes. If any article changed since the last
-# build, pushes an empty/marker commit which triggers a Vercel deploy.
+# Polls PocketBase every ~10 min. If an article changed since the last build,
+# it builds the Astro site and deploys to Vercel via the Vercel CLI using a
+# token — which bypasses Vercel Hobby's "commit author must be a team member"
+# block that was stopping the git-triggered deploys.
 #
-# IMPORTANT: Vercel's free (Hobby) plan only builds commits pushed by the
-# account owner — not github-actions[bot]. So we push using your personal
-# token (repo secret GH_PAT) and author the commit as your GitHub user, so
-# Vercel attributes the deploy to you and builds it.
+# State (last-seen timestamp) is kept in the Actions cache, so this workflow
+# never pushes commits.
 on:
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 concurrency:
   group: kb-rebuild
@@ -23,38 +20,51 @@ env:
   PB_URL: https://synel-kb-kimble.fly.dev
 
 jobs:
-  check-and-rebuild:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_PAT }}   # push as YOU, not the bot
 
-      - name: Rebuild if PocketBase content changed
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # restore the last-seen PocketBase timestamp from cache
+      - uses: actions/cache/restore@v4
+        with:
+          path: .last-kb-sync
+          key: kb-sync-${{ github.run_id }}
+          restore-keys: kb-sync-
+
+      - name: Detect change
+        id: check
         run: |
-          set -e
           LATEST=$(curl -s "$PB_URL/api/collections/articles/records?perPage=1&sort=-updated" \
-            | python3 -c "import sys,json; d=json.load(sys.stdin); print((d.get('items') or [{}])[0].get('updated',''))")
+            | python3 -c "import sys,json; print((json.load(sys.stdin).get('items') or [{}])[0].get('updated',''))")
           PREV=$(cat .last-kb-sync 2>/dev/null || echo "")
-          echo "latest in PocketBase: '$LATEST'  | last built: '$PREV'"
-          if [ -z "$LATEST" ]; then
-            echo "Could not read PocketBase (it may be momentarily down); skipping this run."
-            exit 0
+          echo "latest in PocketBase: '$LATEST' | last built: '$PREV'"
+          if [ -n "$LATEST" ] && [ "$LATEST" != "$PREV" ]; then
+            echo "changed=yes" >> "$GITHUB_OUTPUT"
+            printf '%s' "$LATEST" > .last-kb-sync
+          else
+            echo "changed=no" >> "$GITHUB_OUTPUT"
           fi
-          if [ "$LATEST" = "$PREV" ]; then
-            echo "No change since last build — nothing to do."
-            exit 0
-          fi
-          echo "Change detected — triggering a rebuild."
-          # author the commit as the token owner (you) so Vercel will build it
-          WHO=$(curl -s -H "Authorization: Bearer $GH_PAT" https://api.github.com/user)
-          LOGIN=$(echo "$WHO" | python3 -c "import sys,json;print(json.load(sys.stdin).get('login',''))")
-          UID_=$(echo "$WHO"  | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))")
-          git config user.name  "${LOGIN:-synel-kb}"
-          git config user.email "${UID_}+${LOGIN}@users.noreply.github.com"
-          echo "$LATEST" > .last-kb-sync
-          git add .last-kb-sync
-          git commit -m "chore: KB content updated — rebuild"
-          git push
+
+      - name: Build & deploy to Vercel
+        if: steps.check.outputs.changed == 'yes'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npm i -g vercel@latest
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      # persist the new timestamp so we don't redeploy the same change
+      - uses: actions/cache/save@v4
+        if: steps.check.outputs.changed == 'yes'
+        with:
+          path: .last-kb-sync
+          key: kb-sync-${{ github.run_id }}
