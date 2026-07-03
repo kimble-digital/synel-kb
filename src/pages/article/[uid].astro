@@ -37,6 +37,16 @@ const desc = article.body_html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').tri
 
           <div class="prose" set:html={article.body_html} />
 
+          {article.image_urls && article.image_urls.length > 0 && (
+            <div class="kb-article__images">
+              {article.image_urls.map((u) => (
+                <a href={u} target="_blank" rel="noopener noreferrer">
+                  <img src={u} alt={article.title} loading="lazy" />
+                </a>
+              ))}
+            </div>
+          )}
+
           <div style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--c-divider);display:flex;gap:0.75rem;flex-wrap:wrap;">
             <a class="kb-btn kb-btn--ghost" href={catUrl}>← More in {article.category}</a>
             <a class="kb-btn" href="/support/">Still stuck? Contact support</a>

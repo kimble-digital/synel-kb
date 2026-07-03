@@ -166,6 +166,11 @@ main { display: block; min-height: 60vh; }
 .kb-article__also { font-size: 0.85rem; color: var(--c-muted); margin: 0.75rem 0 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--c-divider); }
 .kb-pill { display: inline-block; font-family: var(--site-font-ui); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-green); background: rgba(49,144,101,0.10); padding: 0.2rem 0.55rem; border-radius: 100px; }
 
+/* Uploaded images (PocketBase `images` field) shown after the body */
+.kb-article__images { margin-top: 1.75rem; display: flex; flex-direction: column; gap: 1rem; }
+.kb-article__images a { display: block; }
+.kb-article__images img { width: 100%; height: auto; border: 1px solid var(--c-divider); border-radius: 12px; }
+
 /* ── Buttons / cards ─────────────────────────────────────────────── */
 .kb-prose-page { max-width: 44rem; margin: 0 auto; padding: clamp(2.5rem,6vw,4rem) 0; }
 .kb-cta-card { background: var(--c-surface); border: 1px solid var(--c-divider); border-radius: 16px; padding: 2rem; margin-top: 1.5rem; }

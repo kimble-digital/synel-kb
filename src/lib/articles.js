@@ -48,6 +48,10 @@ export async function getArticles() {
       product: r.product || '',
       quality: r.quality || '',
       also_covers: r.also_covers || '',
+      // uploaded images live in PocketBase's `images` file field -> build public URLs
+      image_urls: (Array.isArray(r.images) ? r.images : [])
+        .filter(Boolean)
+        .map((f) => (PB_URL ? `${PB_URL}/api/files/articles/${r.id}/${f}` : f)),
     }))
     .sort((a, b) => a.title.localeCompare(b.title));
 
