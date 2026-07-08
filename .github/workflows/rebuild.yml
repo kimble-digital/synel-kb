@@ -1,23 +1,18 @@
-name: Build & deploy site (Vercel CLI)
+name: Scheduled deploy (hourly)
 
-# Vercel's Git integration is disconnected, so this workflow is the deployer.
-# - on push to main  -> deploy (code changes)
-# - every ~10 min    -> deploy only if PocketBase content changed
-# - manual           -> deploy
-# Uses the Vercel CLI + token, which bypasses Hobby's git-author block entirely.
+# Simple + reliable: rebuild and deploy every hour, no change-detection.
+# Also deploys on push to main and on manual trigger. Hourly = 24 builds/day,
+# well within Vercel Hobby limits. Edits made in PocketBase go live within the hour.
 on:
+  schedule:
+    - cron: "0 * * * *"      # top of every hour
   push:
     branches: [main]
-  schedule:
-    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 concurrency:
   group: kb-deploy
   cancel-in-progress: false
-
-env:
-  PB_URL: https://synel-kb-kimble.fly.dev
 
 jobs:
   deploy:
@@ -28,32 +23,7 @@ jobs:
         with:
           node-version: 22
 
-      - uses: actions/cache/restore@v4
-        with:
-          path: .last-kb-sync
-          key: kb-sync-${{ github.run_id }}
-          restore-keys: kb-sync-
-
-      - name: Decide whether to deploy
-        id: decide
-        run: |
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "deploy=yes" >> "$GITHUB_OUTPUT"     # push or manual -> always deploy
-            exit 0
-          fi
-          LATEST=$(curl -s "$PB_URL/api/collections/articles/records?perPage=1&sort=-updated" \
-            | python3 -c "import sys,json; print((json.load(sys.stdin).get('items') or [{}])[0].get('updated',''))")
-          PREV=$(cat .last-kb-sync 2>/dev/null || echo "")
-          echo "latest='$LATEST' prev='$PREV'"
-          if [ -n "$LATEST" ] && [ "$LATEST" != "$PREV" ]; then
-            echo "deploy=yes" >> "$GITHUB_OUTPUT"
-            printf '%s' "$LATEST" > .last-kb-sync
-          else
-            echo "deploy=no" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Build & deploy to Vercel
-        if: steps.decide.outputs.deploy == 'yes'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -63,16 +33,3 @@ jobs:
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           vercel build --prod --token="$VERCEL_TOKEN"
           vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
-
-      - name: Refresh the change marker
-        if: steps.decide.outputs.deploy == 'yes'
-        run: |
-          LATEST=$(curl -s "$PB_URL/api/collections/articles/records?perPage=1&sort=-updated" \
-            | python3 -c "import sys,json; print((json.load(sys.stdin).get('items') or [{}])[0].get('updated',''))")
-          printf '%s' "$LATEST" > .last-kb-sync
-
-      - uses: actions/cache/save@v4
-        if: steps.decide.outputs.deploy == 'yes'
-        with:
-          path: .last-kb-sync
-          key: kb-sync-${{ github.run_id }}
