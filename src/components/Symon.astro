@@ -1,0 +1,602 @@
+---
+// Symon — Synel knowledge-base assistant (floating chat widget).
+// Self-contained + namespaced (.symon-*), so it can't clash with site CSS.
+// Backend endpoint baked into the script: https://synel-symon.co.uk/ask.php
+// Rendered site-wide from BaseLayout.
+---
+<div class="symon-scope">
+    
+    <div class="symon-widget symon-hidden" id="symonWidget" role="dialog" aria-label="Symon knowledge base assistant">
+      <div class="symon-head">
+        <div class="symon-head-left">
+          <div class="symon-mark" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.6" opacity=".35"/><circle cx="12" cy="12" r="3.4" fill="#fff"/></svg>
+          </div>
+          <div>
+            <div class="symon-head-title" id="symonTitle">Symon</div>
+            <div class="symon-head-sub"><span class="symon-dot" id="symonDot"></span><span id="symonSub">Online</span></div>
+          </div>
+        </div>
+        <div class="symon-head-right">
+          <span class="symon-demo-tag" id="symonDemoTag" style="display:none">DEMO</span>
+          <button class="symon-close" id="symonClose" aria-label="Minimise chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="symon-scroll" id="symonScroll">
+        <div class="symon-welcome" id="symonWelcome">
+          <div class="symon-hi-avatar" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.8" fill="#fff"/></svg>
+          </div>
+          <p class="symon-hi" id="symonGreeting">Hi, I'm Symon 👋</p>
+          <p class="symon-hi-sub" id="symonGreetingSub">What can I help you with?</p>
+          <div class="symon-starters" id="symonStarters"></div>
+        </div>
+      </div>
+
+      <div class="symon-composer">
+        <div class="symon-input-row">
+          <textarea class="symon-input" id="symonInput" rows="1" placeholder="Message Symon…" aria-label="Message Symon"></textarea>
+          <button class="symon-send" id="symonSend" aria-label="Send message" disabled>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="symon-powered">Powered by <strong>Claude</strong> · grounded in Synel's knowledge base</div>
+      </div>
+    </div>
+
+    
+    <button class="symon-launcher" id="symonLauncher" aria-label="Open chat with Symon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#fff" stroke-width="1.5" opacity=".4"/><circle cx="12" cy="12" r="3.6" fill="#fff"/></svg>
+      <span class="symon-launcher-pulse" aria-hidden="true"></span>
+    </button>
+  </div>
+
+<style is:global>
+:root {
+    --symon-navy: #232b46;
+    --symon-navy-deep: #1a2138;
+    --symon-coral: #e8643c;
+    --symon-coral-deep: #d4502a;
+    --symon-coral-wash: #fbeee9;
+    --symon-green: #4ad295;
+    --symon-amber: #e8a13c;
+    --symon-paper: #ffffff;
+    --symon-canvas: #f7f6f4;
+    --symon-ink: #232b46;
+    --symon-ink-soft: #5b6276;
+    --symon-ink-faint: #9298a8;
+    --symon-line: #e7e4df;
+  }
+
+  /* Preview backdrop — only visible when this file is opened on its own.
+     Delete this rule (and the 
+  
+  
+
+  /* Everything the widget renders lives under .symon-scope so host styles
+     can't leak in and ours can't leak out. */
+  .symon-scope, .symon-scope * { box-sizing: border-box; }
+  .symon-scope {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    color: var(--symon-ink);
+  }
+
+  /* Launcher bubble */
+  .symon-launcher {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer;
+    background: linear-gradient(165deg, var(--symon-coral) 0%, var(--symon-coral-deep) 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px -4px rgba(232,100,60,.55), 0 2px 6px rgba(26,33,56,.18);
+    transition: opacity .22s ease, transform .2s ease;
+    z-index: 2147483000;
+  }
+  .symon-launcher:hover { transform: scale(1.06); }
+  .symon-launcher:active { transform: scale(.96); }
+  .symon-launcher:focus-visible { outline: 3px solid rgba(232,100,60,.5); outline-offset: 3px; }
+  .symon-launcher.symon-hidden { opacity: 0; transform: scale(.5); pointer-events: none; }
+  .symon-launcher-pulse {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 2px solid var(--symon-coral);
+    animation: symonRing 2.4s ease-out infinite;
+  }
+
+  /* The panel */
+  .symon-widget {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 400px; height: 600px; max-height: calc(100vh - 48px);
+    background: var(--symon-canvas);
+    border-radius: 20px; display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 2px 6px rgba(26,33,56,.06), 0 18px 48px -12px rgba(26,33,56,.32);
+    transform-origin: bottom right;
+    transition: opacity .22s ease, transform .26s cubic-bezier(.2,.8,.3,1);
+    z-index: 2147483000;
+  }
+  .symon-widget.symon-hidden {
+    opacity: 0; transform: scale(.9) translateY(16px); pointer-events: none;
+  }
+
+  /* Header */
+  .symon-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px;
+    background: linear-gradient(165deg, var(--symon-navy) 0%, var(--symon-navy-deep) 100%);
+    flex-shrink: 0;
+  }
+  .symon-head-left { display: flex; align-items: center; gap: 11px; }
+  .symon-mark {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--symon-coral);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(232,100,60,.4);
+  }
+  .symon-head-title { font-size: 14.5px; font-weight: 650; color: #fff; letter-spacing: -.01em; }
+  .symon-head-sub {
+    font-size: 11.5px; color: rgba(255,255,255,.62); margin-top: 1px;
+    display: flex; align-items: center; gap: 5px; font-weight: 450;
+  }
+  .symon-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--symon-green); box-shadow: 0 0 0 3px rgba(74,210,149,.22); }
+  .symon-dot.symon-dot-demo { background: var(--symon-amber); box-shadow: 0 0 0 3px rgba(232,161,60,.22); }
+  .symon-head-right { display: flex; align-items: center; gap: 8px; }
+  .symon-demo-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; color: rgba(255,255,255,.75);
+    background: rgba(255,255,255,.12); padding: 4px 8px; border-radius: 6px;
+  }
+  .symon-close {
+    background: rgba(255,255,255,.1); border: none; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 8px; color: rgba(255,255,255,.7);
+    display: flex; align-items: center; justify-content: center; transition: background .15s ease;
+  }
+  .symon-close:hover { background: rgba(255,255,255,.18); }
+  .symon-close:focus-visible { outline: 2px solid rgba(255,255,255,.6); outline-offset: 1px; }
+
+  /* Scroll area */
+  .symon-scroll { flex: 1; overflow-y: auto; padding: 18px 14px 6px; background: var(--symon-canvas); }
+  .symon-scroll::-webkit-scrollbar { width: 6px; }
+  .symon-scroll::-webkit-scrollbar-thumb { background: #ddd9d3; border-radius: 6px; }
+
+  /* Welcome */
+  .symon-welcome { padding: 8px 6px 4px; animation: symonFade .45s ease; }
+  .symon-hi-avatar {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--symon-coral);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+    box-shadow: 0 4px 12px rgba(232,100,60,.32);
+  }
+  .symon-hi { font-size: 17px; font-weight: 650; color: var(--symon-ink); margin: 0; letter-spacing: -.01em; }
+  .symon-hi-sub { font-size: 13.5px; line-height: 1.5; color: var(--symon-ink-soft); margin: 7px 0 0; }
+  .symon-starters { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .symon-starter {
+    text-align: left; font-size: 13px; font-weight: 520; color: var(--symon-navy);
+    background: var(--symon-paper); border: 1px solid var(--symon-line);
+    border-radius: 12px; padding: 11px 14px; cursor: pointer;
+    transition: all .15s ease; font-family: inherit; box-shadow: 0 1px 2px rgba(26,33,56,.03);
+  }
+  .symon-starter:hover { border-color: var(--symon-coral); color: var(--symon-coral-deep); background: var(--symon-coral-wash); }
+  .symon-starter:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 1px; }
+
+  /* Messages */
+  .symon-msg { display: flex; gap: 9px; margin-bottom: 16px; animation: symonRise .3s ease; }
+  .symon-msg-user { justify-content: flex-end; }
+  .symon-avatar {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; background: var(--symon-coral);
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    box-shadow: 0 2px 6px rgba(232,100,60,.3);
+  }
+  .symon-bubble-wrap { max-width: 84%; display: flex; flex-direction: column; }
+  .symon-msg-user .symon-bubble-wrap { align-items: flex-end; }
+  .symon-bubble { padding: 11px 14px; border-radius: 16px; font-size: 13.5px; line-height: 1.55; }
+  .symon-msg-bot .symon-bubble {
+    background: var(--symon-paper); border: 1px solid var(--symon-line);
+    border-bottom-left-radius: 5px; color: var(--symon-ink); box-shadow: 0 1px 2px rgba(26,33,56,.03);
+  }
+  .symon-msg-user .symon-bubble { background: var(--symon-navy); color: #f4f5f8; border-bottom-right-radius: 5px; }
+  .symon-bubble-error { background: var(--symon-coral-wash) !important; border-color: #f3d3c8 !important; color: var(--symon-coral-deep) !important; }
+  .symon-bubble p { margin: 0; }
+  .symon-bubble p + p { margin-top: 8px; }
+  .symon-bubble strong { font-weight: 680; color: var(--symon-navy); }
+  .symon-bubble em { font-style: italic; }
+  .symon-bubble code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px; background: #efece7; color: var(--symon-navy);
+    padding: 1px 5px; border-radius: 5px;
+  }
+  .symon-bubble a { color: var(--symon-coral-deep); text-decoration: underline; text-underline-offset: 2px; }
+  .symon-bubble a:hover { color: var(--symon-coral); }
+  .symon-bubble .symon-h { font-weight: 680; color: var(--symon-navy); margin: 10px 0 4px; line-height: 1.35; }
+  .symon-bubble .symon-h:first-child { margin-top: 0; }
+  .symon-bubble .symon-h1 { font-size: 15px; }
+  .symon-bubble .symon-h2 { font-size: 14px; }
+  .symon-bubble .symon-h3 { font-size: 13px; }
+  .symon-bubble ul, .symon-bubble ol { margin: 6px 0; padding-left: 20px; }
+  .symon-bubble li { margin: 3px 0; }
+  .symon-bubble li::marker { color: var(--symon-ink-faint); }
+
+  /* Sources */
+  .symon-sources { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; padding-left: 2px; }
+  .symon-source-chip {
+    font-size: 11.5px; font-weight: 540; color: var(--symon-coral-deep);
+    background: var(--symon-coral-wash); border: 1px solid #f3d8cd;
+    padding: 5px 9px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .symon-src-ico { opacity: .7; flex-shrink: 0; }
+  a.symon-source-chip { text-decoration: none; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+  a.symon-source-chip:hover { background: #f9e0d6; border-color: #eeb9a6; }
+  a.symon-source-chip:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 1px; }
+
+  /* Thinking */
+  .symon-thinking {
+    display: inline-flex; align-items: center; gap: 5px; padding: 13px 15px;
+    background: var(--symon-paper); border: 1px solid var(--symon-line);
+    border-radius: 16px; border-bottom-left-radius: 5px;
+  }
+  .symon-think-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--symon-coral); animation: symonPulse 1.3s ease-in-out infinite; }
+  .symon-think-dot:nth-child(2) { animation-delay: .18s; }
+  .symon-think-dot:nth-child(3) { animation-delay: .36s; }
+
+  /* Composer */
+  .symon-composer { padding: 12px 14px 14px; background: var(--symon-canvas); flex-shrink: 0; }
+  .symon-input-row {
+    display: flex; align-items: flex-end; gap: 8px; background: var(--symon-paper);
+    border: 1px solid var(--symon-line); border-radius: 14px; padding: 6px 6px 6px 14px;
+    transition: border-color .15s ease, box-shadow .15s ease; box-shadow: 0 1px 2px rgba(26,33,56,.03);
+  }
+  .symon-input-row:focus-within { border-color: var(--symon-coral); box-shadow: 0 0 0 3px rgba(232,100,60,.12); }
+  .symon-input {
+    flex: 1; border: none; background: transparent; resize: none; font-family: inherit;
+    font-size: 13.5px; line-height: 1.5; color: var(--symon-ink); outline: none; padding: 6px 0; max-height: 110px;
+  }
+  .symon-input::placeholder { color: var(--symon-ink-faint); }
+  .symon-send {
+    width: 36px; height: 36px; border-radius: 11px; border: none; background: var(--symon-coral);
+    color: #fff; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .symon-send:hover:not(:disabled) { background: var(--symon-coral-deep); }
+  .symon-send:active:not(:disabled) { transform: scale(.93); }
+  .symon-send:disabled { background: #d8d4ce; cursor: default; }
+  .symon-send:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 2px; }
+  .symon-powered { text-align: center; font-size: 10.5px; color: var(--symon-ink-faint); margin-top: 9px; letter-spacing: .01em; }
+  .symon-powered strong { font-weight: 640; color: var(--symon-ink-soft); }
+
+  @keyframes symonFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes symonRise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes symonPulse { 0%, 100% { opacity: .3; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
+  @keyframes symonRing {
+    0% { opacity: .6; transform: scale(1); }
+    70% { opacity: 0; transform: scale(1.5); }
+    100% { opacity: 0; transform: scale(1.5); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .symon-welcome, .symon-msg, .symon-think-dot, .symon-launcher-pulse, .symon-widget { animation: none; transition: none; }
+  }
+
+  /* Full-screen on small viewports */
+  @media (max-width: 460px) {
+    .symon-widget {
+      bottom: 0; right: 0; left: 0; top: 0;
+      width: 100%; height: 100%; max-height: 100%; border-radius: 0;
+    }
+    .symon-launcher { bottom: 18px; right: 18px; }
+  }
+</style>
+
+<script is:inline>
+(function () {
+  "use strict";
+
+  // ── CONFIG ─────────────────────────────────────────────────────────────
+  var SYMON_CONFIG = {
+    // Backend endpoint. Leave "" for demo mode. Overridable via window.SYMON_ENDPOINT.
+    endpoint: "https://synel-symon.co.uk/ask.php",
+    title: "Symon",
+    greeting: "Hi, I'm Symon 👋",
+    greetingSub: "What can I help you with?",
+    placeholder: "Message Symon…",
+    starters: [
+      "Clear a 'No Free Finger' error on a Synergy A",
+      "Which cards and credentials does the Synergy A support?",
+      "Our SWF notification emails have stopped — where do I start?",
+      "A card reads on one reader but not another — what's wrong?"
+    ]
+  };
+
+  function endpoint() {
+    return (window.SYMON_ENDPOINT || SYMON_CONFIG.endpoint || "").trim();
+  }
+  var DEMO = !endpoint();
+
+  // ── Built-in demo answers (used only when no endpoint is set) ────────────
+  // The `url` values below are example.com placeholders, here only so the
+  // preview shows the clickable-link styling. The live backend sends the
+  // real article URLs.
+  var DEMO_ANSWERS = {
+    "clear a 'no free finger' error on a synergy a": {
+      answer:
+        "**What it means**\n" +
+        "The registration number you're assigning is already in use by another employee on that device.\n\n" +
+        "**How to clear it**\n" +
+        "1. Delete the employee currently using that number.\n" +
+        "2. Register the new employee — the number is now free to assign.",
+      sources: [{ id: "synergy-a-errors", title: "Synergy A — Error Messages & Solutions", url: "https://example.com/kb/synergy-a-errors" }]
+    },
+    "which cards and credentials does the synergy a support?": {
+      answer:
+        "The Synergy A reads several credential types:\n\n" +
+        "- **Proximity** — HID Prox and Synel Prox (125 kHz)\n" +
+        "- **Mifare** — read-only, serial number (CSN) only (13.56 MHz)\n" +
+        "- **Magnetic stripe** — Track I and II\n" +
+        "- **Barcode** — Code 39 / 25 / 128\n" +
+        "- **External reader** — over Wiegand (26 / 34 / 37-bit)\n\n" +
+        "It also supports **fingerprint, PIN and camera** verification, and combinations such as card + fingerprint.",
+      sources: [{ id: "synergy-a-cards", title: "Synergy A — Supported Card Types", url: "https://example.com/kb/synergy-a-cards" }]
+    },
+    "our swf notification emails have stopped — where do i start?": {
+      answer:
+        "Start with the two settings behind most email problems:\n\n" +
+        "1. **Check Spam/Junk first** — rule out the obvious.\n" +
+        "2. **Confirm Email Settings and Site URL** — in SWF, `System Setup → Email Settings` and `System Setup → Options → General`. The Site URL must match the address staff actually use, or emails arrive with broken images and links.\n\n" +
+        "If *every* email type stopped at once, the usual causes are changed SMTP credentials, the mail server being down, or a changed Site URL.",
+      sources: [{ id: "email-setup", title: "Email Notifications — Setup & Troubleshooting", url: "https://example.com/kb/email-setup" }]
+    },
+    "a card reads on one reader but not another — what's wrong?": {
+      answer:
+        "This is almost always a **card-format mismatch** between the two readers.\n\n" +
+        "Card decoding is set per terminal — the start position, length and padding. If one reader decodes the card differently from the reader the employee was enrolled on, the number won't match.\n\n" +
+        "Check the card decoding parameters in each terminal's definition and make sure they're identical.",
+      sources: [{ id: "sy400", title: "SY400 — Access Control Controller", url: "https://example.com/kb/sy400" }]
+    }
+  };
+  var DEMO_DEFAULT = {
+    answer:
+      "This preview has a few example answers built in, so I can't take that specific one here yet.\n\n" +
+      "Once the backend endpoint is connected, Symon answers any question across the full Synel knowledge base, with the source guide shown under each answer. Try one of the suggested questions to see the shape of a real reply.",
+    sources: []
+  };
+
+  // ── State + elements ─────────────────────────────────────────────────────
+  var state = { messages: [], loading: false, started: false };
+  var els = {
+    widget: document.getElementById("symonWidget"),
+    launcher: document.getElementById("symonLauncher"),
+    close: document.getElementById("symonClose"),
+    scroll: document.getElementById("symonScroll"),
+    welcome: document.getElementById("symonWelcome"),
+    starters: document.getElementById("symonStarters"),
+    input: document.getElementById("symonInput"),
+    send: document.getElementById("symonSend"),
+    title: document.getElementById("symonTitle"),
+    greeting: document.getElementById("symonGreeting"),
+    greetingSub: document.getElementById("symonGreetingSub"),
+    sub: document.getElementById("symonSub"),
+    dot: document.getElementById("symonDot"),
+    demoTag: document.getElementById("symonDemoTag")
+  };
+
+  // ── Apply config to the UI ────────────────────────────────────────────────
+  els.title.textContent = SYMON_CONFIG.title;
+  els.greeting.textContent = SYMON_CONFIG.greeting;
+  els.greetingSub.textContent = SYMON_CONFIG.greetingSub;
+  els.input.placeholder = SYMON_CONFIG.placeholder;
+  if (DEMO) {
+    els.sub.textContent = "Demo mode";
+    els.dot.classList.add("symon-dot-demo");
+    els.demoTag.style.display = "";
+  } else {
+    els.sub.textContent = "Online";
+  }
+
+  SYMON_CONFIG.starters.forEach(function (s) {
+    var b = document.createElement("button");
+    b.className = "symon-starter";
+    b.type = "button";
+    b.textContent = s;
+    b.addEventListener("click", function () { send(s); });
+    els.starters.appendChild(b);
+  });
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function scrollDown() { els.scroll.scrollTop = els.scroll.scrollHeight; }
+  function srcIcon() {
+    return '<svg class="symon-src-ico" width="11" height="11" viewBox="0 0 24 24" fill="none">' +
+           '<path d="M9 12h6M9 16h6M9 8h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+           '<rect x="5" y="3" width="14" height="18" rx="2.5" stroke="currentColor" stroke-width="1.8"/></svg>';
+  }
+  function botAvatar() {
+    return '<div class="symon-avatar" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" fill="#fff"/></svg></div>';
+  }
+  function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
+  function safeUrl(u) { return /^(https?:\/\/|\/)/i.test(String(u)) ? String(u) : ""; }
+
+  // Minimal, safe Markdown -> HTML for answer text. It escapes first, then
+  // converts a small, predictable subset (headings, bold, italic, inline code,
+  // links, and bulleted/numbered lists) so the model's Markdown renders
+  // instead of showing raw ** and # characters.
+  function mdInline(s) {
+    s = String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function (_, t, u) {
+      return '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + t + "</a>";
+    });
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    s = s.replace(/(^|[^_\w])_([^_\n]+)_/g, "$1<em>$2</em>");
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    return s;
+  }
+  function renderMarkdown(src) {
+    var lines = String(src).replace(/\r\n/g, "\n").split("\n");
+    var html = "", list = null, para = [];
+    function flushPara() { if (para.length) { html += "<p>" + para.map(mdInline).join("<br>") + "</p>"; para = []; } }
+    function closeList() { if (list) { html += "</" + list + ">"; list = null; } }
+    lines.forEach(function (raw) {
+      var line = raw.replace(/\s+$/, "");
+      if (line.trim() === "") { flushPara(); closeList(); return; }
+      var h = line.match(/^(#{1,3})\s+(.*)$/);
+      if (h) { flushPara(); closeList(); html += '<div class="symon-h symon-h' + h[1].length + '">' + mdInline(h[2]) + "</div>"; return; }
+      var ol = line.match(/^\s*\d+\.\s+(.*)$/);
+      if (ol) { flushPara(); if (list !== "ol") { closeList(); html += "<ol>"; list = "ol"; } html += "<li>" + mdInline(ol[1]) + "</li>"; return; }
+      var ul = line.match(/^\s*[-*]\s+(.*)$/);
+      if (ul) { flushPara(); if (list !== "ul") { closeList(); html += "<ul>"; list = "ul"; } html += "<li>" + mdInline(ul[1]) + "</li>"; return; }
+      closeList(); para.push(line);
+    });
+    flushPara(); closeList();
+    return html;
+  }
+  function updateSendDisabled() {
+    els.send.disabled = state.loading || !els.input.value.trim();
+  }
+  function resize() {
+    els.input.style.height = "auto";
+    els.input.style.height = Math.min(els.input.scrollHeight, 110) + "px";
+  }
+  function hideWelcome() {
+    if (!state.started) { els.welcome.style.display = "none"; state.started = true; }
+  }
+
+  // ── Rendering ──────────────────────────────────────────────────────────────
+  function addUser(text) {
+    var m = document.createElement("div");
+    m.className = "symon-msg symon-msg-user";
+    m.innerHTML = '<div class="symon-bubble-wrap"><div class="symon-bubble"><p>' + escapeHtml(text) + "</p></div></div>";
+    els.scroll.appendChild(m);
+    scrollDown();
+  }
+  function addThinking() {
+    var m = document.createElement("div");
+    m.className = "symon-msg symon-msg-bot";
+    m.id = "symonThinking";
+    m.innerHTML = botAvatar() +
+      '<div class="symon-bubble-wrap"><div class="symon-thinking"><span class="symon-think-dot"></span><span class="symon-think-dot"></span><span class="symon-think-dot"></span></div></div>';
+    els.scroll.appendChild(m);
+    scrollDown();
+  }
+  function removeThinking() {
+    var t = document.getElementById("symonThinking");
+    if (t) t.remove();
+  }
+  function addBot(answer, sources) {
+    var m = document.createElement("div");
+    m.className = "symon-msg symon-msg-bot";
+    var html = botAvatar() + '<div class="symon-bubble-wrap"><div class="symon-bubble">' + renderMarkdown(answer) + "</div>";
+    if (sources && sources.length) {
+      html += '<div class="symon-sources">';
+      sources.forEach(function (s) {
+        var url = safeUrl(s.url);
+        if (url) {
+          html += '<a class="symon-source-chip symon-source-link" href="' + escapeAttr(url) +
+                  '" target="_blank" rel="noopener noreferrer">' + srcIcon() + escapeHtml(s.title) + "</a>";
+        } else {
+          html += '<span class="symon-source-chip">' + srcIcon() + escapeHtml(s.title) + "</span>";
+        }
+      });
+      html += "</div>";
+    }
+    html += "</div>";
+    m.innerHTML = html;
+    els.scroll.appendChild(m);
+    scrollDown();
+  }
+  function addError() {
+    var m = document.createElement("div");
+    m.className = "symon-msg symon-msg-bot";
+    m.innerHTML = botAvatar() +
+      '<div class="symon-bubble-wrap"><div class="symon-bubble symon-bubble-error">' +
+      "<p>Symon couldn't reach the knowledge base just now. Give it a moment and try again.</p></div></div>";
+    els.scroll.appendChild(m);
+    scrollDown();
+  }
+
+  // ── Answering ────────────────────────────────────────────────────────────────
+  function normalizeSources(src) {
+    if (!Array.isArray(src)) return [];
+    return src.map(function (s) {
+      if (typeof s === "string") return { id: s, title: s, url: "" };
+      if (s && typeof s === "object") return { id: s.id || s.title || "", title: s.title || s.id || "", url: typeof s.url === "string" ? s.url : "" };
+      return null;
+    }).filter(function (s) { return s && s.title; });
+  }
+  function normalizeReply(data) {
+    var answer = data && typeof data.answer === "string" ? data.answer.trim() : "";
+    if (!answer) throw new Error("No answer in response");
+    return { answer: answer, sources: normalizeSources(data && data.sources) };
+  }
+  function askBackend(q) {
+    var history = state.messages.slice(0, -1).map(function (m) {
+      return { role: m.role, content: m.content };
+    });
+    return fetch(endpoint(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: q, history: history })
+    }).then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    }).then(normalizeReply);
+  }
+  function askDemo(q) {
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        resolve(DEMO_ANSWERS[q.toLowerCase().trim()] || DEMO_DEFAULT);
+      }, 700);
+    });
+  }
+
+  function send(text) {
+    var q = (text != null ? text : els.input.value).trim();
+    if (!q || state.loading) return;
+
+    hideWelcome();
+    addUser(q);
+    els.input.value = "";
+    resize();
+    state.messages.push({ role: "user", content: q });
+    state.loading = true;
+    updateSendDisabled();
+    addThinking();
+
+    var ask = endpoint() ? askBackend(q) : askDemo(q);
+    ask.then(function (reply) {
+      removeThinking();
+      addBot(reply.answer, reply.sources);
+      state.messages.push({ role: "assistant", content: reply.answer });
+    }).catch(function () {
+      removeThinking();
+      addError();
+      // Drop the unanswered user turn so history stays clean for the next try.
+      state.messages.pop();
+    }).then(function () {
+      state.loading = false;
+      updateSendDisabled();
+    });
+  }
+
+  // ── Open / close ───────────────────────────────────────────────────────────
+  function open() {
+    els.widget.classList.remove("symon-hidden");
+    els.launcher.classList.add("symon-hidden");
+    setTimeout(function () { els.input.focus(); }, 260);
+  }
+  function close() {
+    els.widget.classList.add("symon-hidden");
+    els.launcher.classList.remove("symon-hidden");
+  }
+  els.launcher.addEventListener("click", open);
+  els.close.addEventListener("click", close);
+
+  // ── Composer wiring ────────────────────────────────────────────────────────
+  els.input.addEventListener("input", function () { resize(); updateSendDisabled(); });
+  els.input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  els.send.addEventListener("click", function () { send(); });
+
+  // Expose a tiny API for host pages that want to open/close programmatically.
+  window.Symon = { open: open, close: close };
+})();
+</script>
