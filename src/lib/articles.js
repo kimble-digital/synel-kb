@@ -5,9 +5,11 @@
 
 import fallback from '../data/articles.json';
 
-// Default to the live PocketBase so the build always pulls fresh data + images,
-// even if PB_URL isn't wired into the CI/Vercel build env. Override via PB_URL.
-const PB_URL = (import.meta.env.PB_URL || process.env.PB_URL || 'https://synel-kb-kimble.fly.dev').replace(/\/$/, '');
+// The live PocketBase URL. We only honour an env override if it's a real http(s)
+// URL — Vercel injects the literal placeholder "[SENSITIVE]" for env vars marked
+// Sensitive, which is truthy but unusable, so we ignore anything that isn't a URL.
+const _rawPB = (import.meta.env.PB_URL || process.env.PB_URL || '').trim();
+const PB_URL = (/^https?:\/\//i.test(_rawPB) ? _rawPB : 'https://synel-kb-kimble.fly.dev').replace(/\/$/, '');
 
 let _cache = null;
 
