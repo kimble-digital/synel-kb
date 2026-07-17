@@ -17,21 +17,34 @@ export async function getArticles() {
   let rows = null;
 
   if (PB_URL) {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    // Retry: the Fly machine may be cold-starting when a build runs — a first
+    // request wakes it, so retry a few times before giving up on live data.
+    const getJSON = async (url, tries = 8, delay = 3000) => {
+      let lastErr;
+      for (let i = 0; i < tries; i++) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) return await res.json();
+          lastErr = new Error(`HTTP ${res.status}`);
+        } catch (e) { lastErr = e; }
+        if (i < tries - 1) await sleep(delay);
+      }
+      throw lastErr || new Error('unreachable');
+    };
     try {
       const all = [];
       for (let page = 1; ; page++) {
         const url = `${PB_URL}/api/collections/articles/records`
           + `?perPage=500&page=${page}&filter=${encodeURIComponent("status='published'")}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`PocketBase ${res.status}`);
-        const data = await res.json();
+        const data = await getJSON(url);
         all.push(...(data.items || []));
         if (page >= (data.totalPages || 1)) break;
       }
       rows = all;
       console.log(`[articles] loaded ${rows.length} from PocketBase (${PB_URL})`);
     } catch (err) {
-      console.warn(`[articles] PocketBase fetch failed (${err.message}); using local fallback`);
+      console.warn(`[articles] PocketBase fetch failed after retries (${err.message}); using local fallback`);
     }
   }
 
