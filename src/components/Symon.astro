@@ -1,8 +1,6 @@
 ---
-// Symon — Synel knowledge-base assistant (floating chat widget).
-// Self-contained + namespaced (.symon-*), so it can't clash with site CSS.
-// Backend endpoint baked into the script: https://synel-symon.co.uk/ask.php
-// Rendered site-wide from BaseLayout.
+// Symon — Synel knowledge-base assistant (floating chat widget). Team-provided, latest version.
+// Self-contained + namespaced (.symon-*). Endpoint baked in: https://synel-symon.co.uk/ask.php
 ---
 <div class="symon-scope">
     
@@ -14,25 +12,35 @@
           </div>
           <div>
             <div class="symon-head-title" id="symonTitle">Symon</div>
-            <div class="symon-head-sub"><span class="symon-dot" id="symonDot"></span><span id="symonSub">Online</span></div>
+            <div class="symon-head-sub" id="symonSubRow"><span class="symon-dot" id="symonDot"></span><span id="symonSub"></span></div>
           </div>
         </div>
         <div class="symon-head-right">
           <span class="symon-demo-tag" id="symonDemoTag" style="display:none">DEMO</span>
-          <button class="symon-close" id="symonClose" aria-label="Minimise chat">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <button class="symon-close" id="symonClose" aria-label="Close chat" title="Close">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
       </div>
 
       <div class="symon-scroll" id="symonScroll">
         <div class="symon-welcome" id="symonWelcome">
+          <div class="symon-langs" id="symonLangs" role="group" aria-label="Language">
+            <button class="symon-lang" id="symonLangEn" type="button" aria-label="English">
+              <svg width="16" height="11" viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#012169"/><path d="M0,0 60,40 M60,0 0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 60,40 M60,0 0,40" stroke="#C8102E" stroke-width="3.5"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="13"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7.5"/></svg>
+              <span>EN</span>
+            </button>
+            <button class="symon-lang" id="symonLangFr" type="button" aria-label="Fran&#231;ais">
+              <svg width="16" height="11" viewBox="0 0 60 40" aria-hidden="true"><rect width="20" height="40" fill="#002395"/><rect x="20" width="20" height="40" fill="#fff"/><rect x="40" width="20" height="40" fill="#ED2939"/></svg>
+              <span>FR</span>
+            </button>
+          </div>
           <div class="symon-hi-avatar" aria-hidden="true">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.8" fill="#fff"/></svg>
           </div>
           <p class="symon-hi" id="symonGreeting">Hi, I'm Symon 👋</p>
           <p class="symon-hi-sub" id="symonGreetingSub">What can I help you with?</p>
-          <div class="symon-starters" id="symonStarters"></div>
+          <div class="symon-caps" id="symonStarters"></div>
         </div>
       </div>
 
@@ -43,14 +51,25 @@
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
-        <div class="symon-powered">Powered by <strong>Claude</strong> · grounded in Synel's knowledge base</div>
       </div>
+      <div class="symon-foot" id="symonFoot">Powered by Claude · grounded in Synel's knowledge base</div>
     </div>
 
     
-    <button class="symon-launcher" id="symonLauncher" aria-label="Open chat with Symon">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#fff" stroke-width="1.5" opacity=".4"/><circle cx="12" cy="12" r="3.6" fill="#fff"/></svg>
-      <span class="symon-launcher-pulse" aria-hidden="true"></span>
+    <div class="symon-launcher-wrap" id="symonLauncherWrap">
+      <button class="symon-launcher" id="symonLauncher" aria-label="Open chat with Symon">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#fff" stroke-width="1.5" opacity=".4"/><circle cx="12" cy="12" r="3.6" fill="#fff"/></svg>
+        <span class="symon-launcher-pulse" aria-hidden="true"></span>
+      </button>
+      <button class="symon-launcher-x" id="symonLauncherX" aria-label="Collapse Symon" title="Collapse">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    
+    <button class="symon-tab symon-hidden" id="symonTab" aria-label="Open chat with Symon">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.4" stroke="#fff" stroke-width="1.6" opacity=".4"/><circle cx="12" cy="12" r="3.4" fill="#fff"/></svg>
+      <span>Chat</span>
     </button>
   </div>
 
@@ -71,7 +90,7 @@
     --symon-line: #e7e4df;
   }
 
-  /* Preview backdrop — only visible when this file is opened on its own.
+  /* Preview backdrop - only visible when this file is opened on its own.
      Delete this rule (and the 
   
   
@@ -84,25 +103,62 @@
     color: var(--symon-ink);
   }
 
+  /* Launcher: a fixed wrapper holding the orange blob + its collapse x */
+  .symon-launcher-wrap {
+    position: fixed; bottom: 24px; right: 24px;
+    z-index: 2147483000;
+    transition: opacity .22s ease, transform .2s ease;
+  }
+  .symon-launcher-wrap.symon-hidden { opacity: 0; transform: scale(.5); pointer-events: none; }
+
   /* Launcher bubble */
   .symon-launcher {
-    position: fixed; bottom: 24px; right: 24px;
-    width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer;
+    position: relative;
+    width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
     background: linear-gradient(165deg, var(--symon-coral) 0%, var(--symon-coral-deep) 100%);
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 6px 20px -4px rgba(232,100,60,.55), 0 2px 6px rgba(26,33,56,.18);
-    transition: opacity .22s ease, transform .2s ease;
-    z-index: 2147483000;
+    transition: transform .2s ease;
   }
   .symon-launcher:hover { transform: scale(1.06); }
   .symon-launcher:active { transform: scale(.96); }
   .symon-launcher:focus-visible { outline: 3px solid rgba(232,100,60,.5); outline-offset: 3px; }
-  .symon-launcher.symon-hidden { opacity: 0; transform: scale(.5); pointer-events: none; }
   .symon-launcher-pulse {
     position: absolute; inset: 0; border-radius: 50%;
     border: 2px solid var(--symon-coral);
     animation: symonRing 2.4s ease-out infinite;
   }
+
+  /* Small x on the blob - collapses it right down to the slim tab */
+  .symon-launcher-x {
+    position: absolute; left: 50%; bottom: calc(100% + 8px); margin-left: -11px;
+    width: 22px; height: 22px; border-radius: 50%; padding: 0; cursor: pointer;
+    border: none;
+    background: var(--symon-navy); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 8px -1px rgba(26,33,56,.4);
+    transition: background .15s ease, transform .1s ease;
+    z-index: 2;
+  }
+  .symon-launcher-x:hover { background: var(--symon-navy-deep); transform: scale(1.12); }
+  .symon-launcher-x:active { transform: scale(.95); }
+  .symon-launcher-x:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 2px; }
+
+  /* Slim tab - the entire resting footprint once the blob is dismissed */
+  .symon-tab {
+    position: fixed; bottom: 20px; right: 20px;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px 3px 7px; border: none; cursor: pointer; border-radius: 999px;
+    background: linear-gradient(165deg, var(--symon-navy) 0%, var(--symon-navy-deep) 100%);
+    color: #fff; font-family: inherit; font-size: 10.5px; font-weight: 600; letter-spacing: -.01em;
+    box-shadow: 0 3px 10px -4px rgba(26,33,56,.5), 0 1px 2px rgba(26,33,56,.2);
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 2147483000;
+  }
+  .symon-tab:hover { transform: translateY(-1px); }
+  .symon-tab:active { transform: translateY(0); }
+  .symon-tab:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 2px; }
+  .symon-tab.symon-hidden { opacity: 0; transform: scale(.7) translateY(10px); pointer-events: none; }
 
   /* The panel */
   .symon-widget {
@@ -167,14 +223,49 @@
   .symon-hi { font-size: 17px; font-weight: 650; color: var(--symon-ink); margin: 0; letter-spacing: -.01em; }
   .symon-hi-sub { font-size: 13.5px; line-height: 1.5; color: var(--symon-ink-soft); margin: 7px 0 0; }
   .symon-starters { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
-  .symon-starter {
-    text-align: left; font-size: 13px; font-weight: 520; color: var(--symon-navy);
+
+  /* Language flags (intro page) */
+  .symon-langs { display: flex; justify-content: flex-end; gap: 6px; margin: 0 0 8px; }
+  .symon-lang {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: inherit; font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+    color: var(--symon-ink-soft); background: var(--symon-paper);
+    border: 1px solid var(--symon-line); border-radius: 999px;
+    padding: 4px 10px 4px 7px; cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .symon-lang:hover { border-color: var(--symon-coral); }
+  .symon-lang:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 1px; }
+  .symon-lang.symon-lang-on {
+    border-color: var(--symon-coral); color: var(--symon-coral-deep);
+    background: var(--symon-coral-wash);
+  }
+  .symon-lang svg { border-radius: 2px; display: block; }
+
+  /* Capability rows - what Symon can DO, not a list of FAQs */
+  .symon-caps { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .symon-caps-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--symon-ink-faint); margin: 2px 2px 4px;
+  }
+  .symon-cap {
+    display: flex; align-items: flex-start; gap: 11px; text-align: left; width: 100%;
     background: var(--symon-paper); border: 1px solid var(--symon-line);
-    border-radius: 12px; padding: 11px 14px; cursor: pointer;
+    border-radius: 12px; padding: 12px 13px; cursor: pointer;
     transition: all .15s ease; font-family: inherit; box-shadow: 0 1px 2px rgba(26,33,56,.03);
   }
-  .symon-starter:hover { border-color: var(--symon-coral); color: var(--symon-coral-deep); background: var(--symon-coral-wash); }
-  .symon-starter:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 1px; }
+  .symon-cap:hover { border-color: var(--symon-coral); background: var(--symon-coral-wash); }
+  .symon-cap:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 1px; }
+  .symon-cap-ico {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 9px;
+    background: var(--symon-coral-wash); color: var(--symon-coral-deep);
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .symon-cap:hover .symon-cap-ico { background: var(--symon-coral); color: #fff; }
+  .symon-cap-text { display: flex; flex-direction: column; gap: 2px; padding-top: 1px; }
+  .symon-cap-title { font-size: 13px; font-weight: 600; color: var(--symon-navy); letter-spacing: -.01em; }
+  .symon-cap-sub { font-size: 11.5px; line-height: 1.4; color: var(--symon-ink-soft); }
 
   /* Messages */
   .symon-msg { display: flex; gap: 9px; margin-bottom: 16px; animation: symonRise .3s ease; }
@@ -195,23 +286,24 @@
   .symon-bubble-error { background: var(--symon-coral-wash) !important; border-color: #f3d3c8 !important; color: var(--symon-coral-deep) !important; }
   .symon-bubble p { margin: 0; }
   .symon-bubble p + p { margin-top: 8px; }
-  .symon-bubble strong { font-weight: 680; color: var(--symon-navy); }
-  .symon-bubble em { font-style: italic; }
+
+  /* Markdown inside bot bubbles */
+  .symon-bubble ul, .symon-bubble ol { margin: 8px 0; padding-left: 20px; }
+  .symon-bubble li { margin: 4px 0; }
+  .symon-bubble li > p { margin: 0; }
   .symon-bubble code {
+    background: #f2efe9; border: 1px solid var(--symon-line); border-radius: 5px;
+    padding: 1px 5px; font-size: 12px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 12px; background: #efece7; color: var(--symon-navy);
-    padding: 1px 5px; border-radius: 5px;
   }
-  .symon-bubble a { color: var(--symon-coral-deep); text-decoration: underline; text-underline-offset: 2px; }
-  .symon-bubble a:hover { color: var(--symon-coral); }
-  .symon-bubble .symon-h { font-weight: 680; color: var(--symon-navy); margin: 10px 0 4px; line-height: 1.35; }
-  .symon-bubble .symon-h:first-child { margin-top: 0; }
-  .symon-bubble .symon-h1 { font-size: 15px; }
-  .symon-bubble .symon-h2 { font-size: 14px; }
-  .symon-bubble .symon-h3 { font-size: 13px; }
-  .symon-bubble ul, .symon-bubble ol { margin: 6px 0; padding-left: 20px; }
-  .symon-bubble li { margin: 3px 0; }
-  .symon-bubble li::marker { color: var(--symon-ink-faint); }
+  .symon-bubble .symon-pre {
+    background: var(--symon-navy-deep); color: #e8eaf2; border-radius: 10px;
+    padding: 10px 12px; overflow-x: auto; margin: 8px 0;
+  }
+  .symon-bubble .symon-pre code { background: transparent; border: none; color: inherit; padding: 0; font-size: 12px; display: block; white-space: pre; }
+  .symon-bubble a { color: var(--symon-coral-deep); text-decoration: underline; }
+  .symon-bubble p.symon-h { margin-top: 10px; font-size: 14px; }
+  .symon-bubble p.symon-h:first-child { margin-top: 0; }
 
   /* Sources */
   .symon-sources { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; padding-left: 2px; }
@@ -220,10 +312,9 @@
     background: var(--symon-coral-wash); border: 1px solid #f3d8cd;
     padding: 5px 9px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;
   }
-  .symon-src-ico { opacity: .7; flex-shrink: 0; }
   a.symon-source-chip { text-decoration: none; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
-  a.symon-source-chip:hover { background: #f9e0d6; border-color: #eeb9a6; }
-  a.symon-source-chip:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 1px; }
+  a.symon-source-chip:hover { background: #f7ddd2; border-color: var(--symon-coral); }
+  .symon-src-ico { opacity: .7; flex-shrink: 0; }
 
   /* Thinking */
   .symon-thinking {
@@ -236,7 +327,7 @@
   .symon-think-dot:nth-child(3) { animation-delay: .36s; }
 
   /* Composer */
-  .symon-composer { padding: 12px 14px 14px; background: var(--symon-canvas); flex-shrink: 0; }
+  .symon-composer { padding: 12px 14px 8px; background: var(--symon-canvas); flex-shrink: 0; }
   .symon-input-row {
     display: flex; align-items: flex-end; gap: 8px; background: var(--symon-paper);
     border: 1px solid var(--symon-line); border-radius: 14px; padding: 6px 6px 6px 14px;
@@ -257,8 +348,12 @@
   .symon-send:active:not(:disabled) { transform: scale(.93); }
   .symon-send:disabled { background: #d8d4ce; cursor: default; }
   .symon-send:focus-visible { outline: 2px solid var(--symon-coral); outline-offset: 2px; }
-  .symon-powered { text-align: center; font-size: 10.5px; color: var(--symon-ink-faint); margin-top: 9px; letter-spacing: .01em; }
-  .symon-powered strong { font-weight: 640; color: var(--symon-ink-soft); }
+
+  /* Footer */
+  .symon-foot {
+    text-align: center; font-size: 10.5px; color: var(--symon-ink-faint);
+    padding: 6px 14px 10px; background: var(--symon-canvas); flex-shrink: 0;
+  }
 
   @keyframes symonFade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes symonRise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -279,7 +374,7 @@
       bottom: 0; right: 0; left: 0; top: 0;
       width: 100%; height: 100%; max-height: 100%; border-radius: 0;
     }
-    .symon-launcher { bottom: 18px; right: 18px; }
+    .symon-launcher-wrap, .symon-tab { bottom: 18px; right: 18px; }
   }
 </style>
 
@@ -287,80 +382,195 @@
 (function () {
   "use strict";
 
-  // ── CONFIG ─────────────────────────────────────────────────────────────
+  // -- CONFIG ---------------------------------------------------------------
   var SYMON_CONFIG = {
-    // Backend endpoint. Leave "" for demo mode. Overridable via window.SYMON_ENDPOINT.
+    // Backend endpoint. Leave "" for demo mode. Overridable per embed with
+    // ?endpoint=... on the widget URL, or window.SYMON_ENDPOINT (inline only).
     endpoint: "https://synel-symon.co.uk/ask.php",
     title: "Symon",
-    greeting: "Hi, I'm Symon 👋",
-    greetingSub: "What can I help you with?",
-    placeholder: "Message Symon…",
-    starters: [
-      "Clear a 'No Free Finger' error on a Synergy A",
-      "Which cards and credentials does the Synergy A support?",
-      "Our SWF notification emails have stopped — where do I start?",
-      "A card reads on one reader but not another — what's wrong?"
-    ]
+    // "auto" = French browsers start in French, everyone else in English.
+    // Set to "en" or "fr" to force a default. Users can switch via the flags.
+    defaultLang: "auto",
+    // Text under the name in the header when live. Empty = row hidden.
+    liveStatus: ""
   };
 
+  // -- All display wording, both languages, baked in --------------------------
+  var I18N = {
+    en: {
+      greeting: "Hi, I'm Symon 👋",
+      greetingSub: "More than a search box. Here's how I can help:",
+      placeholder: "Message Symon…",
+      capsLabel: "What I can do",
+      footer: "Powered by Claude · grounded in Synel's knowledge base",
+      error: "Symon couldn't reach the knowledge base just now. Give it a moment and try again.",
+      capabilities: [
+        {
+          icon: "diagnose",
+          title: "Diagnose faults from symptoms",
+          sub: "Describe what's happening and I'll trace the cause",
+          prompt: "My Synergy A worked fine yesterday and now no cards read. Help me work out what changed."
+        },
+        {
+          icon: "crossref",
+          title: "Cross-reference your setup",
+          sub: "Answers matched to your model, firmware and cards",
+          prompt: "I've got three sites on different Synergy firmware. Which should I update, and in what order?"
+        },
+        {
+          icon: "config",
+          title: "Step-by-step fixes",
+          sub: "Documented steps quoted exactly, and I'll say plainly when something isn't documented",
+          prompt: "Walk me through setting up card + fingerprint verification on the Synergy A."
+        },
+        {
+          icon: "handoff",
+          title: "Hand off to a human",
+          sub: "I'll summarise the whole thread for your Synel engineer",
+          prompt: "Can you summarise this conversation so I can send it to a Synel engineer?"
+        }
+      ]
+    },
+    fr: {
+      greeting: "Bonjour, je suis Symon 👋",
+      greetingSub: "Plus qu'une simple barre de recherche. Voici comment je peux vous aider :",
+      placeholder: "Écrivez à Symon…",
+      capsLabel: "Ce que je sais faire",
+      footer: "Optimisé par Claude · fondé sur la base de connaissances Synel",
+      error: "Symon n'arrive pas à joindre la base de connaissances pour le moment. Patientez un instant et réessayez.",
+      capabilities: [
+        {
+          icon: "diagnose",
+          title: "Diagnostiquer une panne",
+          sub: "Décrivez le problème et je remonte à la cause",
+          prompt: "Ma Synergy A fonctionnait très bien hier et ce matin plus aucun badge n'est lu. Aidez-moi à comprendre ce qui a changé."
+        },
+        {
+          icon: "crossref",
+          title: "Vérifier votre configuration",
+          sub: "Des réponses adaptées à votre modèle, firmware et badges",
+          prompt: "J'ai trois sites avec des versions de firmware Synergy différentes. Lequel mettre à jour, et dans quel ordre ?"
+        },
+        {
+          icon: "config",
+          title: "Des solutions pas à pas",
+          sub: "Les étapes documentées, citées exactement, et je le dis clairement quand ce n'est pas documenté",
+          prompt: "Guidez-moi pour configurer la vérification badge + empreinte digitale sur la Synergy A."
+        },
+        {
+          icon: "handoff",
+          title: "Passer le relais à un humain",
+          sub: "Je résume toute la conversation pour votre technicien Synel",
+          prompt: "Pouvez-vous résumer cette conversation pour que je l'envoie à un technicien Synel ?"
+        }
+      ]
+    }
+  };
+
+  // Endpoint resolution: widget URL param (iframe-safe) > window var (inline
+  // embeds) > baked default. Blank = demo mode.
   function endpoint() {
+    try {
+      var qs = new URLSearchParams(window.location.search).get("endpoint");
+      if (qs && (/^https?:\/\//i.test(qs) || qs.indexOf(":") === -1)) return qs.trim();
+    } catch (e) { /* very old browser - fall through */ }
     return (window.SYMON_ENDPOINT || SYMON_CONFIG.endpoint || "").trim();
   }
   var DEMO = !endpoint();
 
-  // ── Built-in demo answers (used only when no endpoint is set) ────────────
-  // The `url` values below are example.com placeholders, here only so the
-  // preview shows the clickable-link styling. The live backend sends the
-  // real article URLs.
-  var DEMO_ANSWERS = {
-    "clear a 'no free finger' error on a synergy a": {
+  // -- Built-in demo answers (used only when no endpoint is set) -------------
+  var DEMO_BY_CAP = {
+    diagnose: {
       answer:
-        "**What it means**\n" +
-        "The registration number you're assigning is already in use by another employee on that device.\n\n" +
-        "**How to clear it**\n" +
-        "1. Delete the employee currently using that number.\n" +
-        "2. Register the new employee — the number is now free to assign.",
-      sources: [{ id: "synergy-a-errors", title: "Synergy A — Error Messages & Solutions", url: "https://example.com/kb/synergy-a-errors" }]
+        "Let's work through it. When cards stop reading overnight, it's nearly always one of three things:\n\n" +
+        "1. **Card technology mismatch** - the Synergy A has separate readers for Prox (125 kHz) and Mifare (13.56 MHz). If a new batch of cards is the other technology, they won't read.\n" +
+        "2. **Reader settings changed** - check the card format settings against your commissioning sheet.\n" +
+        "3. **Reader fault** - if *no* card of any type reads and the terminal is otherwise normal, the reader module may have failed.\n\n" +
+        "Quick test that splits the possibilities: does a colleague's known-good card read?",
+      sources: [
+        { id: "synergy-a-cards", title: "Synergy A - Supported Card Types" },
+        { id: "synergy-a-errors", title: "Synergy A - Error Messages & Solutions" }
+      ]
     },
-    "which cards and credentials does the synergy a support?": {
+    crossref: {
       answer:
-        "The Synergy A reads several credential types:\n\n" +
-        "- **Proximity** — HID Prox and Synel Prox (125 kHz)\n" +
-        "- **Mifare** — read-only, serial number (CSN) only (13.56 MHz)\n" +
-        "- **Magnetic stripe** — Track I and II\n" +
-        "- **Barcode** — Code 39 / 25 / 128\n" +
-        "- **External reader** — over Wiegand (26 / 34 / 37-bit)\n\n" +
-        "It also supports **fingerprint, PIN and camera** verification, and combinations such as card + fingerprint.",
-      sources: [{ id: "synergy-a-cards", title: "Synergy A — Supported Card Types", url: "https://example.com/kb/synergy-a-cards" }]
+        "Here's how I'd sequence it:\n\n" +
+        "1. **Note each site's firmware version** (shown on the terminal's info screen).\n" +
+        "2. **Update the furthest-behind site first** - fewer version jumps, fewer surprises.\n" +
+        "3. **Run it live for a day** - confirm clockings flow into SWF before touching the next site.\n\n" +
+        "In live mode I check your versions against the release notes in the knowledge base and flag any migration steps between yours and the target.",
+      sources: [{ id: "release-notes", title: "Release Notes & Versions" }]
     },
-    "our swf notification emails have stopped — where do i start?": {
+    config: {
       answer:
-        "Start with the two settings behind most email problems:\n\n" +
-        "1. **Check Spam/Junk first** — rule out the obvious.\n" +
-        "2. **Confirm Email Settings and Site URL** — in SWF, `System Setup → Email Settings` and `System Setup → Options → General`. The Site URL must match the address staff actually use, or emails arrive with broken images and links.\n\n" +
-        "If *every* email type stopped at once, the usual causes are changed SMTP credentials, the mail server being down, or a changed Site URL.",
-      sources: [{ id: "email-setup", title: "Email Notifications — Setup & Troubleshooting", url: "https://example.com/kb/email-setup" }]
+        "Here's the shape of a live answer:\n\n" +
+        "1. On the terminal, open **Menu → Verification Settings** (supervisor PIN needed).\n" +
+        "2. Set the verification mode to **Card + Fingerprint**.\n" +
+        "3. Enrol each employee: present their card, then capture the fingerprint when prompted.\n" +
+        "4. Test with two or three employees before rolling out site-wide.\n\n" +
+        "*This demo answer is illustrative. Live answers quote the documented steps exactly, and if a setting isn't in the docs, I say so plainly rather than guessing.*",
+      sources: [{ id: "synergy-a-verification", title: "Synergy A - Verification Modes" }]
     },
-    "a card reads on one reader but not another — what's wrong?": {
+    handoff: {
       answer:
-        "This is almost always a **card-format mismatch** between the two readers.\n\n" +
-        "Card decoding is set per terminal — the start position, length and padding. If one reader decodes the card differently from the reader the employee was enrolled on, the number won't match.\n\n" +
-        "Check the card decoding parameters in each terminal's definition and make sure they're identical.",
-      sources: [{ id: "sy400", title: "SY400 — Access Control Controller", url: "https://example.com/kb/sy400" }]
+        "**Summary for your Synel engineer**\n\n" +
+        "- **Device:** Synergy A\n" +
+        "- **Issue:** Cards stopped reading after working normally\n" +
+        "- **Tried so far:** known-good card test, reader settings check\n" +
+        "- **Status:** unresolved, needs an engineer\n\n" +
+        "In live mode I build this from our actual conversation, ready to paste into an email.",
+      sources: []
     }
   };
+  // Map every card prompt (both languages) + legacy typed questions to demo answers.
+  var DEMO_ANSWERS = {
+    "synergy a error: 'no free finger'": {
+      answer:
+        "\"No Free Finger\" means the registration number you're trying to use is already assigned to another employee on that device.\n\n" +
+        "To fix it: delete the existing employee using that number, then register the new one, and the number is free to assign again.",
+      sources: [{ id: "synergy-a-errors", title: "Synergy A - Error Messages & Solutions" }]
+    },
+    "what cards does the synergy a take?": {
+      answer:
+        "The Synergy A supports **HID Prox**, **Synel Prox**, **Mifare** (read-only - serial number only), magnetic stripe (Track I & II) and barcode (Code 39 / 25 / 128), plus an external reader over Wiegand (26 / 34 / 37-bit).\n\n" +
+        "Alongside cards it also does fingerprint, PIN and camera verification, and combinations such as card + fingerprint.",
+      sources: [{ id: "synergy-a-cards", title: "Synergy A - Supported Card Types" }]
+    },
+    "my swf emails aren't sending": {
+      answer:
+        "Start with the two things behind most email problems:\n\n" +
+        "1. Check the **Spam/Junk** folder first.\n" +
+        "2. In SWF, confirm both **Email Settings** (System Setup → Email Settings) and the **Site URL** (System Setup → Options → General) are present and valid - the Site URL must match the address staff actually use to reach SWF, or emails arrive with broken images and links.\n\n" +
+        "If every email type stopped at once, the usual causes are changed SMTP credentials, the mail server being down, or a changed Site URL.",
+      sources: [{ id: "email-setup", title: "Email Notifications - Setup & Troubleshooting" }]
+    },
+    "mifare vs prox?": {
+      answer:
+        "They're different radio frequencies, so a card is one or the other, never both. **Prox** (HID Prox, Synel Prox) runs at 125 kHz; **Mifare** runs at 13.56 MHz, and a reader for one can't read the other.\n\n" +
+        "The Synergy A has separate onboard readers for both, so it reads either - but its Mifare reader is read-only: it reads the card's serial number, not the encrypted sectors.",
+      sources: [{ id: "synergy-a-cards", title: "Synergy A - Supported Card Types" }]
+    }
+  };
+  ["en", "fr"].forEach(function (lng) {
+    I18N[lng].capabilities.forEach(function (c) {
+      if (DEMO_BY_CAP[c.icon]) DEMO_ANSWERS[c.prompt.toLowerCase().trim()] = DEMO_BY_CAP[c.icon];
+    });
+  });
   var DEMO_DEFAULT = {
     answer:
       "This preview has a few example answers built in, so I can't take that specific one here yet.\n\n" +
-      "Once the backend endpoint is connected, Symon answers any question across the full Synel knowledge base, with the source guide shown under each answer. Try one of the suggested questions to see the shape of a real reply.",
+      "Once the backend endpoint is connected, Symon answers any question across the full Synel knowledge base, with the source guide shown under each answer. Try one of the suggested cards to see the shape of a real reply.",
     sources: []
   };
 
-  // ── State + elements ─────────────────────────────────────────────────────
-  var state = { messages: [], loading: false, started: false };
+  // -- State + elements -------------------------------------------------------
+  var state = { messages: [], loading: false, started: false, collapsed: false, lang: "en" };
   var els = {
     widget: document.getElementById("symonWidget"),
     launcher: document.getElementById("symonLauncher"),
+    launcherWrap: document.getElementById("symonLauncherWrap"),
+    launcherX: document.getElementById("symonLauncherX"),
+    tab: document.getElementById("symonTab"),
     close: document.getElementById("symonClose"),
     scroll: document.getElementById("symonScroll"),
     welcome: document.getElementById("symonWelcome"),
@@ -370,34 +580,93 @@
     title: document.getElementById("symonTitle"),
     greeting: document.getElementById("symonGreeting"),
     greetingSub: document.getElementById("symonGreetingSub"),
+    subRow: document.getElementById("symonSubRow"),
     sub: document.getElementById("symonSub"),
     dot: document.getElementById("symonDot"),
-    demoTag: document.getElementById("symonDemoTag")
+    demoTag: document.getElementById("symonDemoTag"),
+    foot: document.getElementById("symonFoot"),
+    langEn: document.getElementById("symonLangEn"),
+    langFr: document.getElementById("symonLangFr")
   };
 
-  // ── Apply config to the UI ────────────────────────────────────────────────
+  // -- Header basics ------------------------------------------------------------
   els.title.textContent = SYMON_CONFIG.title;
-  els.greeting.textContent = SYMON_CONFIG.greeting;
-  els.greetingSub.textContent = SYMON_CONFIG.greetingSub;
-  els.input.placeholder = SYMON_CONFIG.placeholder;
   if (DEMO) {
     els.sub.textContent = "Demo mode";
     els.dot.classList.add("symon-dot-demo");
     els.demoTag.style.display = "";
+  } else if (SYMON_CONFIG.liveStatus) {
+    els.sub.textContent = SYMON_CONFIG.liveStatus;
   } else {
-    els.sub.textContent = "Online";
+    // No status text when live: hide the whole row, dot included.
+    els.subRow.style.display = "none";
   }
 
-  SYMON_CONFIG.starters.forEach(function (s) {
-    var b = document.createElement("button");
-    b.className = "symon-starter";
-    b.type = "button";
-    b.textContent = s;
-    b.addEventListener("click", function () { send(s); });
-    els.starters.appendChild(b);
-  });
+  // Inline SVG icons for the capability rows (no external icon font needed).
+  var CAP_ICONS = {
+    diagnose: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2 5 4-14 2 7h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    crossref: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M7 5v9a3 3 0 0 0 3 3h7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="5" r="2.1" stroke="currentColor" stroke-width="1.9"/><circle cx="17" cy="17" r="2.1" stroke="currentColor" stroke-width="1.9"/></svg>',
+    config: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="2.3" fill="currentColor"/><circle cx="15" cy="12" r="2.3" fill="currentColor"/><circle cx="8" cy="17" r="2.3" fill="currentColor"/></svg>',
+    handoff: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 8l4 4-4 4M19 12H8M8 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+  // Build the caps label + four cards once; applyLang() fills the wording.
+  var capLabel = document.createElement("div");
+  capLabel.className = "symon-caps-label";
+  els.starters.appendChild(capLabel);
+
+  var cardEls = [];
+  for (var ci = 0; ci < 4; ci++) {
+    (function () {
+      var b = document.createElement("button");
+      b.className = "symon-cap";
+      b.type = "button";
+      b.innerHTML =
+        '<span class="symon-cap-ico" aria-hidden="true"></span>' +
+        '<span class="symon-cap-text">' +
+          '<span class="symon-cap-title"></span>' +
+          '<span class="symon-cap-sub"></span>' +
+        '</span>';
+      b.addEventListener("click", function () { send(b.dataset.prompt); });
+      els.starters.appendChild(b);
+      cardEls.push(b);
+    })();
+  }
+
+  // -- Language switching --------------------------------------------------------
+  function applyLang(lng) {
+    if (lng !== "fr") lng = "en";
+    state.lang = lng;
+    var t = I18N[lng];
+    els.greeting.textContent = t.greeting;
+    els.greetingSub.textContent = t.greetingSub;
+    els.input.placeholder = t.placeholder;
+    capLabel.textContent = t.capsLabel;
+    if (els.foot) els.foot.textContent = t.footer;
+    for (var i = 0; i < cardEls.length && i < t.capabilities.length; i++) {
+      var c = t.capabilities[i];
+      cardEls[i].querySelector(".symon-cap-ico").innerHTML = CAP_ICONS[c.icon] || "";
+      cardEls[i].querySelector(".symon-cap-title").textContent = c.title;
+      cardEls[i].querySelector(".symon-cap-sub").textContent = c.sub;
+      cardEls[i].dataset.prompt = c.prompt;
+    }
+    els.langEn.classList.toggle("symon-lang-on", lng === "en");
+    els.langFr.classList.toggle("symon-lang-on", lng === "fr");
+  }
+  els.langEn.addEventListener("click", function () { applyLang("en"); });
+  els.langFr.addEventListener("click", function () { applyLang("fr"); });
+
+  // Default language: forced by config, or the visitor's browser language.
+  (function () {
+    var d = (SYMON_CONFIG.defaultLang || "auto").toLowerCase();
+    if (d !== "en" && d !== "fr") {
+      var nav = (navigator.language || (navigator.languages && navigator.languages[0]) || "en").toLowerCase();
+      d = (nav.indexOf("fr") === 0) ? "fr" : "en";
+    }
+    applyLang(d);
+  })();
+
+  // -- Helpers ------------------------------------------------------------------
   function escapeHtml(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
@@ -410,44 +679,58 @@
   function botAvatar() {
     return '<div class="symon-avatar" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" fill="#fff"/></svg></div>';
   }
-  function escapeAttr(s) { return escapeHtml(s).replace(/"/g, "&quot;"); }
-  function safeUrl(u) { return /^(https?:\/\/|\/)/i.test(String(u)) ? String(u) : ""; }
 
-  // Minimal, safe Markdown -> HTML for answer text. It escapes first, then
-  // converts a small, predictable subset (headings, bold, italic, inline code,
-  // links, and bulleted/numbered lists) so the model's Markdown renders
-  // instead of showing raw ** and # characters.
-  function mdInline(s) {
-    s = String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, function (_, t, u) {
-      return '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + t + "</a>";
-    });
-    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-    s = s.replace(/__([^_]+)__/g, "<strong>$1</strong>");
-    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
-    s = s.replace(/(^|[^_\w])_([^_\n]+)_/g, "$1<em>$2</em>");
-    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
-    return s;
-  }
+  // -- Markdown renderer (escape-first, so nothing the model or a user types
+  //    can inject HTML; supports the subset the backend prompt allows) --------
+  // Code blocks and links are stashed behind ASCII sentinels while the other
+  // rules run, then restored at the end.
   function renderMarkdown(src) {
-    var lines = String(src).replace(/\r\n/g, "\n").split("\n");
-    var html = "", list = null, para = [];
-    function flushPara() { if (para.length) { html += "<p>" + para.map(mdInline).join("<br>") + "</p>"; para = []; } }
-    function closeList() { if (list) { html += "</" + list + ">"; list = null; } }
-    lines.forEach(function (raw) {
-      var line = raw.replace(/\s+$/, "");
-      if (line.trim() === "") { flushPara(); closeList(); return; }
-      var h = line.match(/^(#{1,3})\s+(.*)$/);
-      if (h) { flushPara(); closeList(); html += '<div class="symon-h symon-h' + h[1].length + '">' + mdInline(h[2]) + "</div>"; return; }
-      var ol = line.match(/^\s*\d+\.\s+(.*)$/);
-      if (ol) { flushPara(); if (list !== "ol") { closeList(); html += "<ol>"; list = "ol"; } html += "<li>" + mdInline(ol[1]) + "</li>"; return; }
-      var ul = line.match(/^\s*[-*]\s+(.*)$/);
-      if (ul) { flushPara(); if (list !== "ul") { closeList(); html += "<ul>"; list = "ul"; } html += "<li>" + mdInline(ul[1]) + "</li>"; return; }
-      closeList(); para.push(line);
+    var out = escapeHtml(String(src));
+    var stash = [];
+    function keep(html) { stash.push(html); return "@@SYMON-STASH-" + (stash.length - 1) + "@@"; }
+
+    // Fenced code blocks, then inline code - stashed so later rules skip them.
+    out = out.replace(/```[a-z0-9]*\n?([\s\S]*?)```/gi, function (_, code) {
+      return keep('<pre class="symon-pre"><code>' + code.replace(/^\n+|\n+$/g, "") + "</code></pre>");
     });
-    flushPara(); closeList();
+    out = out.replace(/`([^`\n]+)`/g, function (_, c) { return keep("<code>" + c + "</code>"); });
+
+    // Links - http(s) only.
+    out = out.replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g, function (_, label, url) {
+      return keep('<a href="' + url.replace(/"/g, "&quot;") + '" target="_blank" rel="noopener noreferrer">' + label + "</a>");
+    });
+
+    // Bold, then italic.
+    out = out.replace(/\*\*([^*\n](?:[^*\n]*[^*\n])?)\*\*/g, "<strong>$1</strong>");
+    out = out.replace(/(^|[\s(])\*([^*\n]+)\*(?=$|[\s).,;:!?])/gm, "$1<em>$2</em>");
+
+    // Line-level structure: headings, lists, paragraphs.
+    var lines = out.split("\n");
+    var html = "", para = [], list = null;
+    function flushPara() { if (para.length) { html += "<p>" + para.join("<br>") + "</p>"; para = []; } }
+    function flushList() {
+      if (!list) return;
+      var startAttr = (list.type === "ol" && list.start > 1) ? ' start="' + list.start + '"' : "";
+      html += "<" + list.type + startAttr + ">" + list.items.map(function (i) { return "<li>" + i + "</li>"; }).join("") + "</" + list.type + ">";
+      list = null;
+    }
+    lines.forEach(function (line) {
+      var h  = line.match(/^\s*#{1,4}\s+(.*)$/);
+      var ul = line.match(/^\s*[-•]\s+(.*)$/) || line.match(/^\s*\*\s+(.*)$/);
+      var ol = line.match(/^\s*(\d{1,3})[.)]\s+(.*)$/);
+      if (h)       { flushPara(); flushList(); html += '<p class="symon-h"><strong>' + h[1] + "</strong></p>"; }
+      else if (ol) { flushPara(); if (!list || list.type !== "ol") { flushList(); list = { type: "ol", items: [], start: parseInt(ol[1], 10) || 1 }; } list.items.push(ol[2]); }
+      else if (ul) { flushPara(); if (!list || list.type !== "ul") { flushList(); list = { type: "ul", items: [], start: 1 }; } list.items.push(ul[1]); }
+      else if (/^\s*$/.test(line)) { flushPara(); flushList(); }
+      else { flushList(); para.push(line); }
+    });
+    flushPara(); flushList();
+
+    // Restore stashed code blocks and links.
+    html = html.replace(/@@SYMON-STASH-(\d+)@@/g, function (_, i) { return stash[+i]; });
     return html;
   }
+
   function updateSendDisabled() {
     els.send.disabled = state.loading || !els.input.value.trim();
   }
@@ -459,11 +742,11 @@
     if (!state.started) { els.welcome.style.display = "none"; state.started = true; }
   }
 
-  // ── Rendering ──────────────────────────────────────────────────────────────
+  // -- Rendering ------------------------------------------------------------------
   function addUser(text) {
     var m = document.createElement("div");
     m.className = "symon-msg symon-msg-user";
-    m.innerHTML = '<div class="symon-bubble-wrap"><div class="symon-bubble"><p>' + escapeHtml(text) + "</p></div></div>";
+    m.innerHTML = '<div class="symon-bubble-wrap"><div class="symon-bubble"><p>' + escapeHtml(text).replace(/\n/g, "<br>") + "</p></div></div>";
     els.scroll.appendChild(m);
     scrollDown();
   }
@@ -487,10 +770,8 @@
     if (sources && sources.length) {
       html += '<div class="symon-sources">';
       sources.forEach(function (s) {
-        var url = safeUrl(s.url);
-        if (url) {
-          html += '<a class="symon-source-chip symon-source-link" href="' + escapeAttr(url) +
-                  '" target="_blank" rel="noopener noreferrer">' + srcIcon() + escapeHtml(s.title) + "</a>";
+        if (s.url) {
+          html += '<a class="symon-source-chip" href="' + escapeHtml(s.url).replace(/"/g, "&quot;") + '" target="_blank" rel="noopener noreferrer">' + srcIcon() + escapeHtml(s.title) + "</a>";
         } else {
           html += '<span class="symon-source-chip">' + srcIcon() + escapeHtml(s.title) + "</span>";
         }
@@ -507,17 +788,21 @@
     m.className = "symon-msg symon-msg-bot";
     m.innerHTML = botAvatar() +
       '<div class="symon-bubble-wrap"><div class="symon-bubble symon-bubble-error">' +
-      "<p>Symon couldn't reach the knowledge base just now. Give it a moment and try again.</p></div></div>";
+      "<p>" + escapeHtml(I18N[state.lang].error) + "</p></div></div>";
     els.scroll.appendChild(m);
     scrollDown();
   }
 
-  // ── Answering ────────────────────────────────────────────────────────────────
+  // -- Answering --------------------------------------------------------------------
   function normalizeSources(src) {
     if (!Array.isArray(src)) return [];
     return src.map(function (s) {
-      if (typeof s === "string") return { id: s, title: s, url: "" };
-      if (s && typeof s === "object") return { id: s.id || s.title || "", title: s.title || s.id || "", url: typeof s.url === "string" ? s.url : "" };
+      if (typeof s === "string") return { id: s, title: s };
+      if (s && typeof s === "object") {
+        var out = { id: s.id || s.title || "", title: s.title || s.id || "" };
+        if (typeof s.url === "string" && /^https?:\/\//i.test(s.url)) out.url = s.url;
+        return out;
+      }
       return null;
     }).filter(function (s) { return s && s.title; });
   }
@@ -533,7 +818,7 @@
     return fetch(endpoint(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: q, history: history })
+      body: JSON.stringify({ message: q, lang: state.lang, history: history })
     }).then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
@@ -576,27 +861,46 @@
     });
   }
 
-  // ── Open / close ───────────────────────────────────────────────────────────
+  // -- Open / close / collapse ---------------------------------------------------
+  // Three resting states: the orange blob (default), the slim tab (after the
+  // blob is dismissed with its x), or the open panel. Every page load starts
+  // on the orange blob; the x tucks it into the slim tab for the current
+  // visit. A refresh brings the orange circle right back.
+  state.collapsed = false;
+
+  function hideAll() {
+    els.widget.classList.add("symon-hidden");
+    els.launcherWrap.classList.add("symon-hidden");
+    els.tab.classList.add("symon-hidden");
+  }
+  function rest() {
+    hideAll();
+    (state.collapsed ? els.tab : els.launcherWrap).classList.remove("symon-hidden");
+  }
   function open() {
+    hideAll();
     els.widget.classList.remove("symon-hidden");
-    els.launcher.classList.add("symon-hidden");
     setTimeout(function () { els.input.focus(); }, 260);
   }
-  function close() {
-    els.widget.classList.add("symon-hidden");
-    els.launcher.classList.remove("symon-hidden");
-  }
+  function close() { rest(); }
+  function collapse() { state.collapsed = true; rest(); }
+  function expand() { state.collapsed = false; rest(); }
+
   els.launcher.addEventListener("click", open);
+  els.tab.addEventListener("click", open);
+  els.launcherX.addEventListener("click", function (e) { e.stopPropagation(); collapse(); });
   els.close.addEventListener("click", close);
 
-  // ── Composer wiring ────────────────────────────────────────────────────────
+  rest(); // set the initial resting state (always the orange blob on load)
+
+  // -- Composer wiring -------------------------------------------------------
   els.input.addEventListener("input", function () { resize(); updateSendDisabled(); });
   els.input.addEventListener("keydown", function (e) {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
   });
   els.send.addEventListener("click", function () { send(); });
 
-  // Expose a tiny API for host pages that want to open/close programmatically.
-  window.Symon = { open: open, close: close };
+  // Expose a tiny API for host pages that want to drive it programmatically.
+  window.Symon = { open: open, close: close, collapse: collapse, expand: expand, setLang: applyLang };
 })();
 </script>

@@ -5,7 +5,9 @@
 
 import fallback from '../data/articles.json';
 
-const PB_URL = (import.meta.env.PB_URL || process.env.PB_URL || '').replace(/\/$/, '');
+// Default to the live PocketBase so the build always pulls fresh data + images,
+// even if PB_URL isn't wired into the CI/Vercel build env. Override via PB_URL.
+const PB_URL = (import.meta.env.PB_URL || process.env.PB_URL || 'https://synel-kb-kimble.fly.dev').replace(/\/$/, '');
 
 let _cache = null;
 
