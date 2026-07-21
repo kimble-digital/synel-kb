@@ -5,7 +5,7 @@ name: Scheduled deploy (hourly)
 # well within Vercel Hobby limits. Edits made in PocketBase go live within the hour.
 on:
   schedule:
-    - cron: "0 * * * *"      # top of every hour
+    - cron: "0 7,15 * * *"   # twice a day: 07:00 and 15:00 UTC (~8am & 4pm UK)
   push:
     branches: [main]
   workflow_dispatch:
