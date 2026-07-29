@@ -37,6 +37,16 @@ const canonicalHref = canonicalUrl || Astro.url.href;
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content={siteName} />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51S08KYHFR"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-51S08KYHFR');
+    </script>
+
     <slot name="head" />
   </head>
   <body class="min-h-screen">
