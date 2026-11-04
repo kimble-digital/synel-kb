@@ -1,8 +1,13 @@
-name: Scheduled deploy (hourly)
+name: Scheduled deploy (twice daily)
 
-# Simple + reliable: rebuild and deploy every hour, no change-detection.
-# Also deploys on push to main and on manual trigger. Hourly = 24 builds/day,
-# well within Vercel Hobby limits. Edits made in PocketBase go live within the hour.
+# Simple + reliable: rebuild and deploy on a schedule, no change-detection.
+# Also deploys on push to main and on manual trigger. Edits made in PocketBase
+# go live at the next scheduled run.
+#
+# IMPORTANT: GitHub silently disables scheduled workflows after 60 days with no
+# repo activity (this is what stopped deploys from 27 Sep 2026). The keepalive
+# step below calls the "enable workflow" API on this workflow at every run,
+# which resets that 60-day counter without needing dummy commits.
 on:
   schedule:
     - cron: "0 7,15 * * *"   # twice a day: 07:00 and 15:00 UTC (~8am & 4pm UK)
@@ -14,11 +19,21 @@ concurrency:
   group: kb-deploy
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  actions: write   # needed by the keepalive step
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Keepalive (reset GitHub's 60-day inactivity timer)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method PUT "repos/${{ github.repository }}/actions/workflows/rebuild.yml/enable"
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
