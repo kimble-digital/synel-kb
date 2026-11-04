@@ -1,18 +1,19 @@
-name: Scheduled deploy (twice daily)
+name: Scheduled KB rebuild (twice daily)
 
-# Simple + reliable: rebuild and deploy on a schedule, no change-detection.
-# Also deploys on push to main and on manual trigger. Edits made in PocketBase
-# go live at the next scheduled run.
+# Rebuilds the site on a schedule so edits made in PocketBase go live.
+# The rebuild is triggered by a Vercel Deploy Hook (GitHub secret
+# VERCEL_DEPLOY_HOOK, created in Vercel > synel-kb > Settings > Git > Deploy
+# Hooks). Vercel then pulls main and builds it exactly as it does for a push.
+# Pushes to main are deployed by Vercel's git integration directly, so this
+# workflow only runs on schedule or manual trigger.
 #
 # IMPORTANT: GitHub silently disables scheduled workflows after 60 days with no
 # repo activity (this is what stopped deploys from 27 Sep 2026). The keepalive
-# step below calls the "enable workflow" API on this workflow at every run,
-# which resets that 60-day counter without needing dummy commits.
+# step calls the "enable workflow" API on this workflow at every run, which
+# resets that 60-day counter without needing dummy commits.
 on:
   schedule:
     - cron: "0 7,15 * * *"   # twice a day: 07:00 and 15:00 UTC (~8am & 4pm UK)
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -24,27 +25,22 @@ permissions:
   actions: write   # needed by the keepalive step
 
 jobs:
-  deploy:
+  rebuild:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Keepalive (reset GitHub's 60-day inactivity timer)
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method PUT "repos/${{ github.repository }}/actions/workflows/rebuild.yml/enable"
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Build & deploy to Vercel
+      - name: Trigger Vercel production rebuild via Deploy Hook
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
-          npm i -g vercel@latest
-          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          vercel build --prod --token="$VERCEL_TOKEN"
-          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          if [ -z "$HOOK" ]; then
+            echo "::error::VERCEL_DEPLOY_HOOK secret is not set. Create a Deploy Hook in Vercel (synel-kb > Settings > Git) and add its URL as a repository secret."
+            exit 1
+          fi
+          curl -fsS -X POST "$HOOK"
+          echo
+          echo "Rebuild requested. Check https://vercel.com/rickys-projects-e974cf7d/synel-kb/deployments"
