@@ -12,6 +12,11 @@ const _rawPB = (import.meta.env.PB_URL || process.env.PB_URL || '').trim();
 const PB_URL = (/^https?:\/\//i.test(_rawPB) ? _rawPB : 'https://synel-kb-kimble.fly.dev').replace(/\/$/, '');
 
 let _cache = null;
+// Newest `updated` timestamp in PocketBase (any record, any status) captured
+// BEFORE the article fetch, so /build-info.json can state exactly what this
+// build contains. null = PocketBase was unreachable (fallback data used).
+let _latestUpdated = null;
+export function getLatestUpdated() { return _latestUpdated; }
 
 export async function getArticles() {
   if (_cache) return _cache;
@@ -35,6 +40,8 @@ export async function getArticles() {
       throw lastErr || new Error('unreachable');
     };
     try {
+      const latest = await getJSON(`${PB_URL}/api/collections/articles/records?sort=-updated&perPage=1&fields=updated`);
+      _latestUpdated = latest.items?.[0]?.updated || null;
       const all = [];
       for (let page = 1; ; page++) {
         const url = `${PB_URL}/api/collections/articles/records`
