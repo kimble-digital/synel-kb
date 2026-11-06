@@ -92,6 +92,28 @@ export function slugify(s) {
 
 export const categorySlug = slugify;
 
+// Release Notes are listed newest first, by the version number in the title
+// (e.g. "Synel Workforce 6.7.0 (November 2026)"). Every other category stays
+// alphabetical.
+const RELEASE_NOTES = /release\s*notes/i;
+function versionKey(title) {
+  const m = String(title).match(/\d+(?:\.\d+)+/);
+  return m ? m[0].split('.').map(Number) : null;
+}
+function compareVersionDesc(a, b) {
+  const va = versionKey(a.title), vb = versionKey(b.title);
+  if (va && vb) {
+    for (let i = 0; i < Math.max(va.length, vb.length); i++) {
+      const d = (vb[i] || 0) - (va[i] || 0);
+      if (d) return d;
+    }
+    return 0;
+  }
+  if (va) return -1;
+  if (vb) return 1;
+  return b.title.localeCompare(a.title);
+}
+
 export async function getCategories() {
   const arts = await getArticles();
   const map = new Map();
@@ -101,6 +123,9 @@ export async function getCategories() {
     const c = map.get(slug);
     c.count++;
     c.articles.push(a);
+  }
+  for (const c of map.values()) {
+    if (RELEASE_NOTES.test(c.name)) c.articles.sort(compareVersionDesc);
   }
   return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
